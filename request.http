@@ -1,10 +1,9 @@
-POST http://localhost:5000/help/new-job
-Content-Type: application/json
-Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjNkODc2YWE2NzcwNDk3ZDg2MjI5OWMiLCJpYXQiOjE2NDgzNTQ2OTB9.lwIT3qxhuKklHOjHWsPb7n0GpODJqFMIw-jZC221ZX8`
+GET http://localhost:5000/help/my-post
 
-{
-    "title": "Mid/Senior PHP Developer",
-    "minSalary": 15000000,
-    "maxSalary": 30000000,
-    "languages": "['PHP', 'Laravel', 'MySQL', 'REST API']",
-}
+###
+
+GET http://localhost:5000/abc
+
+###
+
+GET http://localhost:5000/test-register
