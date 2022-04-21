@@ -1,4 +1,4 @@
-const Report = require('../models/Report')
+const Report = require('../models/Report');
 
 class ReportController {
   // @route PUT /report/blog
@@ -9,13 +9,13 @@ class ReportController {
       return res.json({
         success: true,
         message: 'Report successfully!',
-      })
+      });
     } catch (error) {
-      console.log(error.message)
+      console.log(error.message);
       return res.json({
         success: false,
         message: 'Report failed!',
-      })
+      });
     }
   }
 
@@ -27,21 +27,21 @@ class ReportController {
       const report = await Report.create({
         commentId: req.body.commentId,
         reportedBy: req._id,
-      })
+      });
 
       return res.json({
         success: true,
         message: 'Report successfully!',
         report,
-      })
+      });
     } catch (error) {
-      console.log(error.message)
+      console.log(error.message);
       return res.json({
         success: false,
         message: 'Report failed!',
-      })
+      });
     }
   }
 }
 
-module.exports = new ReportController()
+module.exports = new ReportController();

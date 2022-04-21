@@ -1,9 +1,9 @@
-const Job = require('../models/Job')
-const Course = require('../models/Course')
-const Blog = require('../models/Blog')
-const Video = require('../models/Video')
-const User = require('../models/User')
-const Contact = require('../models/Contact')
+const Job = require('../models/Job');
+const Course = require('../models/Course');
+const Blog = require('../models/Blog');
+const Video = require('../models/Video');
+const User = require('../models/User');
+const Contact = require('../models/Contact');
 
 class HelpController {
   // @route POST /setting/fullName
@@ -16,12 +16,12 @@ class HelpController {
         {
           $set: { fullName: req.body.fullName },
         },
-        { new: true },
-      ).select('fullName')
+        { new: true }
+      ).select('fullName');
 
-      return res.json(fullName)
+      return res.json(fullName);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   }
 
@@ -35,12 +35,12 @@ class HelpController {
         {
           $set: { photoURL: req.body.photoURL },
         },
-        { new: true },
-      ).select('photoURL')
+        { new: true }
+      ).select('photoURL');
 
-      return res.json(avatar)
+      return res.json(avatar);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   }
 
@@ -54,24 +54,24 @@ class HelpController {
         {
           $set: { bio: req.body.bio },
         },
-        { new: true },
-      ).select('bio')
+        { new: true }
+      ).select('bio');
 
-      return res.json(bio)
+      return res.json(bio);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   }
 
   async changeSocial(req, res) {
     try {
-      const fb = req.body.fb
-      const youtube = req.body.youtube
-      const instagram = req.body.instagram
-      const linkedin = req.body.linkedin
-      const twitter = req.body.twitter
+      const fb = req.body.fb;
+      const youtube = req.body.youtube;
+      const instagram = req.body.instagram;
+      const linkedin = req.body.linkedin;
+      const twitter = req.body.twitter;
 
-      const social = await User.findById(req._id).select('socials')
+      const social = await User.findById(req._id).select('socials');
 
       const socials = await User.findOneAndUpdate(
         { _id: req._id },
@@ -86,14 +86,14 @@ class HelpController {
             },
           },
         },
-        { new: true },
-      ).select('socials')
+        { new: true }
+      ).select('socials');
 
-      console.log(socials)
+      console.log(socials);
 
-      return res.json(socials)
+      return res.json(socials);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   }
 
@@ -105,15 +105,15 @@ class HelpController {
       const myBlog = await Blog.find({
         postedBy: req._id,
         isPosted: true,
-      }).sort({ createdAt: -1 })
+      }).sort({ createdAt: -1 });
 
-      return res.json(myBlog)
+      return res.json(myBlog);
     } catch (error) {
-      console.log(error.message)
+      console.log(error.message);
       return res.json({
         success: false,
         message: 'Get my blog failed!',
-      })
+      });
     }
   }
 
@@ -128,13 +128,13 @@ class HelpController {
         maxSalary: req.body.maxSalary,
         languages: req.body.languages,
         postedBy: req._id,
-      }
+      };
 
-      const jobs = await Job.create(jobData)
+      const jobs = await Job.create(jobData);
 
-      return res.json(jobs)
+      return res.json(jobs);
     } catch (error) {
-      console.log(error.message)
+      console.log(error.message);
     }
   }
 
@@ -143,11 +143,11 @@ class HelpController {
   // @access Public
   async getJob(req, res) {
     try {
-      const jobs = await Job.find()
+      const jobs = await Job.find();
 
-      return res.json(jobs)
+      return res.json(jobs);
     } catch (error) {
-      console.log(error.message)
+      console.log(error.message);
     }
   }
 
@@ -155,7 +155,7 @@ class HelpController {
   // @desc Search
   // @access Public
   async search(req, res) {
-    console.log(req.params.text)
+    console.log(req.params.text);
     try {
       const data = await Promise.all([
         Course.find({
@@ -212,15 +212,15 @@ class HelpController {
             },
           ],
         }).select('_id videoId title image'),
-      ])
+      ]);
 
       return res.json({
         courses: data[0],
         blogs: data[1],
         videos: data[2],
-      })
+      });
     } catch (error) {
-      console.log(error.message)
+      console.log(error.message);
     }
   }
 
@@ -229,16 +229,16 @@ class HelpController {
   // @access Public
   async contact(req, res) {
     try {
-      const contact = await Contact.create(req.body)
+      const contact = await Contact.create(req.body);
       return res.json({
         success: true,
         message: 'Post success',
         contact,
-      })
+      });
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   }
 }
 
-module.exports = new HelpController()
+module.exports = new HelpController();

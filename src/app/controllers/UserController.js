@@ -1,10 +1,10 @@
-const User = require('../models/User')
-const Blog = require('../models/Blog')
-const nodemailer = require('nodemailer')
-const bcrypt = require('bcrypt')
-const jwt = require('jsonwebtoken')
-const MailHtml = require('../../utils/MailHTML')
-const removeAccents = require('vn-remove-accents')
+const User = require('../models/User');
+const Blog = require('../models/Blog');
+const nodemailer = require('nodemailer');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const MailHtml = require('../../utils/MailHTML');
+const removeAccents = require('vn-remove-accents');
 
 class UserController {
   // @route GET api/auth
@@ -12,16 +12,16 @@ class UserController {
   // @access Public
   async getUser(req, res) {
     try {
-      let user = await User.findById({ _id: req._id })
+      let user = await User.findById({ _id: req._id });
 
-      console.log(user)
+      console.log(user);
 
       return !user
         ? res.json({ success: false, message: 'User not found' })
-        : res.json({ success: true, message: 'Is Valid token', user })
+        : res.json({ success: true, message: 'Is Valid token', user });
     } catch (error) {
-      console.log(error.message)
-      return res.json({ success: false, message: 'Internal server error!' })
+      console.log(error.message);
+      return res.json({ success: false, message: 'Internal server error!' });
     }
   }
 
@@ -29,27 +29,27 @@ class UserController {
   // @desc Register
   // @access Public
   async register(req, res) {
-    console.log(req.body)
+    console.log(req.body);
 
     try {
       const slugExist = await User.find({
         slug: {
           $regex: removeAccents(
-            req.body.fullName.toLowerCase().replace(/\s/g, ''),
+            req.body.fullName.toLowerCase().replace(/\s/g, '')
           ),
           $options: 'i',
         },
-      })
+      });
 
-      let slugExistIndex = ''
-      const isExistUserSlug = slugExist && slugExist.length > 0
-      if (isExistUserSlug) slugExistIndex = slugExist.length + 1
+      let slugExistIndex = '';
+      const isExistUserSlug = slugExist && slugExist.length > 0;
+      if (isExistUserSlug) slugExistIndex = slugExist.length + 1;
 
-      let hashPassword
-      const saltRounds = 10
-      const hasPassword = req.body.password
+      let hashPassword;
+      const saltRounds = 10;
+      const hasPassword = req.body.password;
       if (hasPassword)
-        hashPassword = await bcrypt.hash(req.body.password, saltRounds)
+        hashPassword = await bcrypt.hash(req.body.password, saltRounds);
 
       const user = await User.create({
         fullName: req.body.fullName,
@@ -61,33 +61,33 @@ class UserController {
         slug: `@${removeAccents(
           String(req.body.fullName + slugExistIndex)
             .toLowerCase()
-            .replace(/\s/g, ''),
+            .replace(/\s/g, '')
         )}`,
-      })
+      });
 
-      const hasPhoneNumber = req.body.phoneNumber
+      const hasPhoneNumber = req.body.phoneNumber;
       if (hasPhoneNumber) {
         const accessToken = jwt.sign(
           { _id: user._id },
-          process.env.ACCESS_TOKEN_SECRET,
-        )
+          process.env.ACCESS_TOKEN_SECRET
+        );
 
         return res.json({
           success: true,
           message: 'Data has been posted',
           user,
           accessToken,
-        })
+        });
       }
 
       return res.json({
         success: true,
         message: 'Data has been posted',
         user,
-      })
+      });
     } catch (error) {
-      console.log(error.message)
-      return res.json({ success: false, message: 'Internal error' })
+      console.log(error.message);
+      return res.json({ success: false, message: 'Internal error' });
     }
   }
 
@@ -96,47 +96,47 @@ class UserController {
   // @access Public
   async login(req, res) {
     try {
-      let user = await User.findOne({ email: req.body.email })
+      let user = await User.findOne({ email: req.body.email });
 
       if (!user)
         return res.json({
           success: false,
           message: 'Tài khoản hoặc mật khẩu không chính xác',
-        })
+        });
 
-      const hasPassword = user && user.password && user.password.length !== 0
+      const hasPassword = user && user.password && user.password.length !== 0;
       if (hasPassword) {
-        const isMatch = await bcrypt.compare(req.body.password, user.password)
+        const isMatch = await bcrypt.compare(req.body.password, user.password);
 
         if (!isMatch)
           return res.json({
             success: false,
             message: 'Tài khoản hoặc mật khẩu không chính xác',
-          })
+          });
       } else {
         return res.json({
           success: false,
           message: 'Tài khoản hoặc mật khẩu không chính xác',
-        })
+        });
       }
 
       const accessToken = jwt.sign(
         { _id: user._id },
-        process.env.ACCESS_TOKEN_SECRET,
-      )
+        process.env.ACCESS_TOKEN_SECRET
+      );
 
       return res.json({
         success: true,
         message: 'Đăng nhập thành công',
         user,
         accessToken,
-      })
+      });
     } catch (error) {
-      console.log(error.message)
+      console.log(error.message);
       return res.json({
         success: false,
         message: 'Lỗi hệ thống',
-      })
+      });
     }
   }
 
@@ -145,88 +145,90 @@ class UserController {
   // @access Public
   async loginWithProvider(req, res) {
     try {
-      const hasPhoneNumber = req.body.phoneNumber
+      const hasPhoneNumber = req.body.phoneNumber;
       if (hasPhoneNumber) {
         try {
-          const user = await User.findOne({ phoneNumber: req.body.phoneNumber })
+          const user = await User.findOne({
+            phoneNumber: req.body.phoneNumber,
+          });
 
           const accessToken = jwt.sign(
             { _id: user._id },
-            process.env.ACCESS_TOKEN_SECRET,
-          )
+            process.env.ACCESS_TOKEN_SECRET
+          );
 
           return res.json({
             success: true,
             message: 'Login successfully!',
             user,
             accessToken,
-          })
+          });
         } catch (error) {
           return res.json({
             success: false,
             message: 'Login failed!',
-          })
+          });
         }
       }
 
       // Login with fb, google, github
       const userCreated = await User.findOne({
         email: req.body.email,
-      })
+      });
 
       if (userCreated) {
         const accessToken = jwt.sign(
           { _id: userCreated._id },
-          process.env.ACCESS_TOKEN_SECRET,
-        )
+          process.env.ACCESS_TOKEN_SECRET
+        );
 
         return res.json({
           hasUserCreatedAlready: true,
           message: 'Email has been used!',
           userCreated,
           accessToken,
-        })
+        });
       }
 
       const slugExist = await User.find({
         slug: {
           $regex: removeAccents(
-            req.body.fullName.toLowerCase().replace(/\s/g, ''),
+            req.body.fullName.toLowerCase().replace(/\s/g, '')
           ),
           $options: 'i',
         },
-      })
+      });
 
-      let slugExistIndex = ''
-      const isSlugExist = slugExist && slugExist.length > 0
-      if (isSlugExist) slugExistIndex = slugExist.length + 1
+      let slugExistIndex = '';
+      const isSlugExist = slugExist && slugExist.length > 0;
+      if (isSlugExist) slugExistIndex = slugExist.length + 1;
 
       const user = await User.create({
         ...req.body,
         slug: `@${removeAccents(
           String(req.body.fullName + slugExistIndex)
             .toLowerCase()
-            .replace(/\s/g, ''),
+            .replace(/\s/g, '')
         )}`,
-      })
+      });
 
       const accessToken = jwt.sign(
         { _id: user._id },
-        process.env.ACCESS_TOKEN_SECRET,
-      )
+        process.env.ACCESS_TOKEN_SECRET
+      );
 
       return res.json({
         success: true,
         message: 'Login successfully!',
         user,
         accessToken,
-      })
+      });
     } catch (error) {
-      console.log(error.message)
+      console.log(error.message);
       return res.json({
         success: false,
         message: 'Login failed!',
-      })
+      });
     }
   }
 
@@ -241,7 +243,7 @@ class UserController {
           user: process.env.MAIL_USER,
           pass: process.env.MAIL_PASS,
         },
-      })
+      });
 
       await transport.sendMail({
         from: 'f8clone@gmail.com',
@@ -254,9 +256,9 @@ class UserController {
           option: req.body.option,
           otp: req.body.otp,
         }),
-      })
+      });
     } catch (error) {
-      console.log(error.message)
+      console.log(error.message);
     }
   }
 
@@ -265,7 +267,7 @@ class UserController {
   // @access Public
   async checkEmail(req, res) {
     try {
-      const emailExist = await User.findOne({ email: req.body.email })
+      const emailExist = await User.findOne({ email: req.body.email });
 
       return !emailExist
         ? res.json({
@@ -273,9 +275,9 @@ class UserController {
           })
         : res.json({
             used: 'Email đã được sử dụng',
-          })
+          });
     } catch (error) {
-      console.log(error.message)
+      console.log(error.message);
     }
   }
 
@@ -286,7 +288,7 @@ class UserController {
     try {
       const phoneExist = await User.findOne({
         phoneNumber: req.body.phoneNumber,
-      })
+      });
 
       return !phoneExist
         ? res.json({
@@ -294,9 +296,9 @@ class UserController {
           })
         : res.json({
             used: 'Số điện thoại đã được sử dụng',
-          })
+          });
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   }
 
@@ -305,24 +307,24 @@ class UserController {
   // @access Public
   async resetPassword(req, res) {
     try {
-      const saltRounds = 10
-      const hashPassword = await bcrypt.hash(req.body.password, saltRounds)
+      const saltRounds = 10;
+      const hashPassword = await bcrypt.hash(req.body.password, saltRounds);
 
       await User.findOneAndUpdate(
         { email: req.body.email },
-        { password: hashPassword },
-      )
+        { password: hashPassword }
+      );
 
       return res.json({
         success: true,
         message: 'Password has been reset',
-      })
+      });
     } catch (error) {
-      console.log(error.message)
+      console.log(error.message);
       return res.json({
         success: false,
         message: 'Failed',
-      })
+      });
     }
   }
 
@@ -331,9 +333,9 @@ class UserController {
   // @access Private
   async bookmark(req, res) {
     try {
-      const bookmarked = await User.findById(req._id).select('bookmark')
+      const bookmarked = await User.findById(req._id).select('bookmark');
 
-      const isBookmarkedBlog = bookmarked.bookmark.includes(req.body.blogId)
+      const isBookmarkedBlog = bookmarked.bookmark.includes(req.body.blogId);
 
       if (isBookmarkedBlog) {
         const bookmark = await User.findByIdAndUpdate(
@@ -341,22 +343,22 @@ class UserController {
           {
             $pull: { bookmark: req.body.blogId },
           },
-          { new: true },
-        ).select('bookmark')
+          { new: true }
+        ).select('bookmark');
 
-        return res.json(bookmark)
+        return res.json(bookmark);
       }
       const bookmark = await User.findByIdAndUpdate(
         req._id,
         {
           $push: { bookmark: { $each: [req.body.blogId], $position: 0 } },
         },
-        { new: true },
-      ).select('bookmark')
+        { new: true }
+      ).select('bookmark');
 
-      return res.json(bookmark)
+      return res.json(bookmark);
     } catch (error) {
-      console.log(error.message)
+      console.log(error.message);
     }
   }
 
@@ -365,11 +367,11 @@ class UserController {
   // @access Private
   async getBookmark(req, res) {
     try {
-      const bookmark = await User.findById(req._id).select('bookmark')
+      const bookmark = await User.findById(req._id).select('bookmark');
 
-      return res.json(bookmark)
+      return res.json(bookmark);
     } catch (error) {
-      console.log(error.message)
+      console.log(error.message);
     }
   }
 
@@ -378,17 +380,17 @@ class UserController {
   // @access Private
   async getBookmarkAndBlogAuthor(req, res) {
     try {
-      const blogId = await User.findById(req._id).select('bookmark')
+      const blogId = await User.findById(req._id).select('bookmark');
 
       const bookmark = await Blog.find({
         _id: { $in: blogId.bookmark },
       })
         .select('_id titleDisplay slug createdAt')
-        .populate('postedBy', '_id fullName')
+        .populate('postedBy', '_id fullName');
 
-      return res.json(bookmark)
+      return res.json(bookmark);
     } catch (error) {
-      console.log(error.message)
+      console.log(error.message);
     }
   }
 
@@ -397,20 +399,20 @@ class UserController {
   // @access Public
   async getUserBySlug(req, res) {
     try {
-      console.log('CALLED BY CLIENT')
-      console.log(req.params.slug)
+      console.log('CALLED BY CLIENT');
+      console.log(req.params.slug);
 
       const user = await User.findOne({
         slug: req.params.slug,
-      })
+      });
 
-      console.log('USER BY SLUG: ', user)
+      console.log('USER BY SLUG: ', user);
 
-      res.json(user)
+      res.json(user);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   }
 }
 
-module.exports = new UserController()
+module.exports = new UserController();

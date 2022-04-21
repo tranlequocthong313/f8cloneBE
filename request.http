@@ -6,4 +6,9 @@ GET http://localhost:5000/abc
 
 ###
 
-GET http://localhost:5000/test-register
+POST http://localhost:5000/login/check-email
+Content-Type: 'application/json'
+
+{
+    "email": "tranlequocthong313@gmai.com"
+}

@@ -5,6 +5,7 @@ const cors = require('cors');
 const db = require('./src/config/db/index');
 const route = require('./src/routes');
 const compression = require('compression');
+const createError = require('http-errors');
 const app = express();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http, {
@@ -33,6 +34,17 @@ app.use(
 app.use(express.json());
 
 route(app);
+
+app.use((req, res, next) => {
+  next(createError.NotFound('Route Not Found'));
+});
+
+app.use((err, req, res, next) => {
+  return res.json({
+    status: err.status || 500,
+    message: err.message,
+  });
+});
 
 db.connect();
 

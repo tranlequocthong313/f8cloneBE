@@ -1,4 +1,4 @@
-const Course = require('../models/Course')
+const Course = require('../models/Course');
 
 class CourseController {
   // @route GET /courses/:slug
@@ -7,8 +7,8 @@ class CourseController {
   async getCourse(req, res) {
     try {
       if (req.query.id) {
-        const id = req.query.id
-        console.log(id)
+        const id = req.query.id;
+        console.log(id);
         const course = await Course.findOne({
           episode: {
             $elemMatch: {
@@ -19,20 +19,20 @@ class CourseController {
               },
             },
           },
-        })
+        });
 
-        console.log('Lesson', course)
+        console.log('Lesson', course);
       }
 
-      const course = await Course.findOne({ slug: req.params.slug })
+      const course = await Course.findOne({ slug: req.params.slug });
 
-      return res.json(course)
+      return res.json(course);
     } catch (error) {
-      console.log(error.message)
+      console.log(error.message);
       return {
         success: false,
         message: 'Internal error!',
-      }
+      };
     }
   }
 
@@ -48,20 +48,20 @@ class CourseController {
         Course.find({ 'role.BE': 'Back-end' }).select(
           'id slug image title studentCount'
         ),
-      ])
+      ]);
 
       return res.json({
         courseFE: data[0],
         courseBE: data[1],
-      })
+      });
     } catch (error) {
-      console.log(error.message)
+      console.log(error.message);
       return {
         success: false,
         message: 'Internal error!',
-      }
+      };
     }
   }
 }
 
-module.exports = new CourseController()
+module.exports = new CourseController();

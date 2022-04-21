@@ -1,7 +1,7 @@
-const Blog = require('../models/Blog')
-const User = require('../models/User')
-const schedule = require('node-schedule')
-const cache = require('../../utils/Cache')
+const Blog = require('../models/Blog');
+const User = require('../models/User');
+const schedule = require('node-schedule');
+const cache = require('../../utils/Cache');
 
 class BlogController {
   // @route POST /new-post
@@ -12,9 +12,9 @@ class BlogController {
       const blog = await Blog.create({
         ...req.body,
         postedBy: req._id,
-      })
+      });
 
-      const isScheduleBlog = req.body.schedule
+      const isScheduleBlog = req.body.schedule;
       if (isScheduleBlog) {
         schedule.scheduleJob(
           req.body.schedule,
@@ -23,22 +23,22 @@ class BlogController {
               { _id: blog._id },
               {
                 schedule: null,
-              },
-            ),
-        )
+              }
+            )
+        );
       }
 
       return res.json({
         success: true,
         message: 'Post blog successfully!',
         blog,
-      })
+      });
     } catch (error) {
-      console.log(error.message)
+      console.log(error.message);
       return res.json({
         success: false,
         message: 'Post blog failed!',
-      })
+      });
     }
   }
 
@@ -53,15 +53,15 @@ class BlogController {
         isPosted: true,
       })
         .populate('postedBy')
-        .sort({ createdAt: -1 })
+        .sort({ createdAt: -1 });
 
-      return res.json(allBlog)
+      return res.json(allBlog);
     } catch (error) {
-      console.log(error.message)
+      console.log(error.message);
       return res.json({
         success: false,
         message: 'Get blog failed!',
-      })
+      });
     }
   }
 
@@ -80,20 +80,20 @@ class BlogController {
           .populate('comments.postedBy'),
         Blog.find({ isPopular: true, isPosted: true }).populate(
           'postedBy',
-          '_id fullName bio photoURL',
+          '_id fullName bio photoURL'
         ),
-      ])
+      ]);
 
       return res.json({
         blogSlug: blogData[0],
         blogHighlight: blogData[1],
-      })
+      });
     } catch (error) {
-      console.log(error.message)
+      console.log(error.message);
       return res.json({
         success: false,
         message: 'Get blog failed!',
-      })
+      });
     }
   }
 
@@ -109,11 +109,11 @@ class BlogController {
         tags: req.params.tag,
       })
         .populate('postedBy')
-        .sort({ createdAt: -1 })
+        .sort({ createdAt: -1 });
 
-      return res.json(blogTagData)
+      return res.json(blogTagData);
     } catch (error) {
-      console.log(error.message)
+      console.log(error.message);
     }
   }
 
@@ -129,19 +129,19 @@ class BlogController {
             title: req.body.title,
             content: req.body.content,
           },
-        },
-      )
+        }
+      );
 
       return res.json({
         success: true,
         message: 'Edit blog successfully!',
-      })
+      });
     } catch (error) {
-      console.log(error)
+      console.log(error);
       return res.json({
         success: false,
         message: 'Edit blog failed!',
-      })
+      });
     }
   }
 
@@ -155,15 +155,15 @@ class BlogController {
         _id: { $ne: req.params.blogId },
         schedule: null,
         isPosted: true,
-      }).select('slug titleDisplay')
+      }).select('slug titleDisplay');
 
-      return res.json(blogSameAuthor)
+      return res.json(blogSameAuthor);
     } catch (error) {
-      console.log(error.message)
+      console.log(error.message);
       return res.json({
         success: false,
         message: 'Get blog failed!',
-      })
+      });
     }
   }
 
@@ -174,31 +174,31 @@ class BlogController {
     try {
       const liked = await Blog.where('_id')
         .equals(req.body.blogId)
-        .select('likes')
+        .select('likes');
 
-      const isLikedBlog = liked[0].likes.includes(req._id)
+      const isLikedBlog = liked[0].likes.includes(req._id);
       if (isLikedBlog) {
         const likes = await Blog.findByIdAndUpdate(
           req.body.blogId,
           {
             $pull: { likes: req._id },
           },
-          { new: true },
-        ).select('likes slug postedBy')
+          { new: true }
+        ).select('likes slug postedBy');
 
-        return res.json(likes)
+        return res.json(likes);
       }
       const likes = await Blog.findByIdAndUpdate(
         req.body.blogId,
         {
           $push: { likes: { $each: [req._id], $position: 0 } },
         },
-        { new: true },
-      ).select('likes slug postedBy')
+        { new: true }
+      ).select('likes slug postedBy');
 
-      return res.json(likes)
+      return res.json(likes);
     } catch (error) {
-      console.log(error.message)
+      console.log(error.message);
     }
   }
 
@@ -211,7 +211,7 @@ class BlogController {
         content: req.body.content,
         postedBy: req._id,
         isCode: req.body.isCode,
-      }
+      };
 
       const comments = await Blog.findOneAndUpdate(
         {
@@ -222,16 +222,16 @@ class BlogController {
         },
         {
           new: true,
-        },
+        }
       )
         .select('comments')
-        .populate('comments.postedBy', '_id fullName photoURL')
+        .populate('comments.postedBy', '_id fullName photoURL');
 
-      console.log(commentData, req.body.blogId, comments)
+      console.log(commentData, req.body.blogId, comments);
 
-      return res.json(comments)
+      return res.json(comments);
     } catch (error) {
-      console.log(error.message)
+      console.log(error.message);
     }
   }
 
@@ -247,12 +247,12 @@ class BlogController {
         ],
       })
         .select('comments.replies comments._id')
-        .populate('comments.replies.postedBy', '_id fullName photoURL')
+        .populate('comments.replies.postedBy', '_id fullName photoURL');
 
-      console.log(replyComment)
-      return res.json(replyComment)
+      console.log(replyComment);
+      return res.json(replyComment);
     } catch (error) {
-      console.log(error.message)
+      console.log(error.message);
     }
   }
 
@@ -265,7 +265,7 @@ class BlogController {
         content: req.body.content,
         postedBy: req._id,
         isCode: req.body.isCode,
-      }
+      };
 
       const comments = await Blog.findOneAndUpdate(
         {
@@ -281,16 +281,16 @@ class BlogController {
         },
         {
           new: true,
-        },
+        }
       )
         .select('comments.replies comments._id')
-        .populate('comments.replies.postedBy', '_id fullName photoURL')
+        .populate('comments.replies.postedBy', '_id fullName photoURL');
 
-      console.log(comments)
+      console.log(comments);
 
-      return res.json(comments)
+      return res.json(comments);
     } catch (error) {
-      console.log(error.message)
+      console.log(error.message);
     }
   }
 
@@ -302,7 +302,7 @@ class BlogController {
       const reactData = {
         reactedBy: req._id,
         emoji: req.body.emoji,
-      }
+      };
 
       const comments = await Blog.findOneAndUpdate(
         { 'comments._id': req.body.commentId },
@@ -313,15 +313,15 @@ class BlogController {
         },
         {
           new: true,
-        },
+        }
       )
         .select('comments')
         .populate('comments.postedBy', '_id fullName photoURL')
-        .populate('comments.reacts.reactedBy', '_id fullName photoURL')
+        .populate('comments.reacts.reactedBy', '_id fullName photoURL');
 
-      return res.json(comments)
+      return res.json(comments);
     } catch (error) {
-      console.log(error.message)
+      console.log(error.message);
     }
   }
 
@@ -338,16 +338,16 @@ class BlogController {
             'comments.$.isCode': req.body.isCode,
           },
         },
-        { new: true },
+        { new: true }
       )
         .select('comments')
-        .populate('comments.postedBy', '_id fullName photoURL')
+        .populate('comments.postedBy', '_id fullName photoURL');
 
-      console.log(comments)
+      console.log(comments);
 
-      return res.json(comments)
+      return res.json(comments);
     } catch (error) {
-      console.log(error.message)
+      console.log(error.message);
     }
   }
 
@@ -355,22 +355,22 @@ class BlogController {
   // @desc Delete comment
   // @access Private
   async deleteComment(req, res) {
-    console.log(req.body.commentId)
+    console.log(req.body.commentId);
 
     try {
       const comments = await Blog.findOneAndUpdate(
         { 'comments._id': req.body.commentId },
         { $pull: { comments: { _id: req.body.commentId } } },
-        { new: true },
+        { new: true }
       )
         .select('comments')
-        .populate('comments.postedBy', '_id fullName photoURL')
+        .populate('comments.postedBy', '_id fullName photoURL');
 
-      console.log('Comments: ', comments)
+      console.log('Comments: ', comments);
 
-      return res.json(comments)
+      return res.json(comments);
     } catch (error) {
-      console.log(error.message)
+      console.log(error.message);
     }
   }
 
@@ -383,22 +383,22 @@ class BlogController {
         { _id: req.body.blogId },
         {
           $set: { isPopular: !req.body.isPopular },
-        },
-      ).sort({ createdAt: -1 })
+        }
+      ).sort({ createdAt: -1 });
 
       return res.json({
         success: true,
         message: 'Create Successfully!',
         blog,
-      })
+      });
     } catch (error) {
-      console.log(error.message)
+      console.log(error.message);
       return res.json({
         success: false,
         message: 'Create Failed!',
-      })
+      });
     }
   }
 }
 
-module.exports = new BlogController()
+module.exports = new BlogController();
