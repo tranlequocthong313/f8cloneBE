@@ -9,13 +9,16 @@ const createError = require('http-errors')
 const helmet = require('helmet')
 const logEvents = require('./src/helper/logEvents')
 const app = express()
-const http = require('http')
-const server = http.createServer(app)
-const io = require('socket.io')
-
-app.use(cors())
+const http = require('http').createServer(app)
+const io = require('socket.io')(http, {
+  cors: {
+    origin: '*',
+  },
+})
 
 app.use(helmet())
+
+app.use(cors())
 
 app.use(
   compression({
@@ -46,19 +49,13 @@ app.use((err, req, res, next) => {
   })
 })
 
-db.connect()
-
-io(server, {
-  cors: {
-    origin: '*',
-  },
-})
-
 io.on('connection', (socket) => {
   socket.on('comment', (comment) => {
     io.emit('comment', comment)
   })
 })
 
+db.connect()
+
 const PORT = process.env.PORT || 5000
-server.listen(PORT, () => `Server started on port ${PORT}`)
+http.listen(PORT, () => `Server started on port ${PORT}`)

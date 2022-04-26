@@ -4,8 +4,8 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "SET UV_THREADPOOL_SIZE=64 && node index",
-    "server": "SET UV_THREADPOOL_SIZE=64 && nodemon index"
+    "start": "SET UV_THREADPOOL_SIZE=8 && node index",
+    "server": "SET UV_THREADPOOL_SIZE=8 && nodemon index"
   },
   "dependencies": {
     "bcrypt": "^5.0.1",
