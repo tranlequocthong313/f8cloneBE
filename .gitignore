@@ -1,4 +1,6 @@
 /node_modules
+/logs
 
 .env
 .request.http
+.yarn-error.log

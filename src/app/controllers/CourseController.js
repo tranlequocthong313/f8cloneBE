@@ -1,4 +1,5 @@
-const Course = require('../models/Course');
+const Course = require('../models/Course')
+const createError = require('http-errors')
 
 class CourseController {
   // @route GET /courses/:slug
@@ -6,33 +7,29 @@ class CourseController {
   // @access Public
   async getCourse(req, res) {
     try {
-      if (req.query.id) {
-        const id = req.query.id;
-        console.log(id);
+      const { id } = req.query
+      const { slug } = req.params
+
+      if (id) {
         const course = await Course.findOne({
           episode: {
             $elemMatch: {
               lessons: {
                 $elemMatch: {
-                  id: id,
+                  id,
                 },
               },
             },
           },
-        });
-
-        console.log('Lesson', course);
+        })
       }
 
-      const course = await Course.findOne({ slug: req.params.slug });
+      const course = await Course.findOne({ slug: slug })
 
-      return res.json(course);
+      return res.status(200).json(course)
     } catch (error) {
-      console.log(error.message);
-      return {
-        success: false,
-        message: 'Internal error!',
-      };
+      console.error(error.message)
+      next(createError.InternalServerError())
     }
   }
 
@@ -48,20 +45,17 @@ class CourseController {
         Course.find({ 'role.BE': 'Back-end' }).select(
           'id slug image title studentCount'
         ),
-      ]);
+      ])
 
-      return res.json({
+      return res.status(200).json({
         courseFE: data[0],
         courseBE: data[1],
-      });
+      })
     } catch (error) {
-      console.log(error.message);
-      return {
-        success: false,
-        message: 'Internal error!',
-      };
+      console.error(error.message)
+      next(createError.InternalServerError())
     }
   }
 }
 
-module.exports = new CourseController();
+module.exports = new CourseController()

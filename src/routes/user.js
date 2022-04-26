@@ -3,12 +3,12 @@ const router = express.Router()
 const userController = require('../app/controllers/UserController')
 const verifyToken = require('../middleware/verifyToken')
 
-router.put('/bookmark', verifyToken, userController.bookmark)
+router.patch('/bookmark', verifyToken, userController.bookmark)
 router.get('/bookmark', verifyToken, userController.getBookmark)
 router.get(
   '/bookmark-post',
   verifyToken,
-  userController.getBookmarkAndBlogAuthor,
+  userController.getBookmarkAndBlogAuthor
 )
 router.post('/check-email', userController.checkEmail)
 router.post('/phone-number', userController.checkPhoneNumberExist)

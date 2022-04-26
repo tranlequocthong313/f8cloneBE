@@ -1,75 +1,79 @@
-const Blog = require('../models/Blog');
-const Course = require('../models/Course');
-const Video = require('../models/Video');
+const Blog = require('../models/Blog')
+const Course = require('../models/Course')
+const Video = require('../models/Video')
+const createError = require('http-errors')
 
 class AdminController {
-  // @route POST /blog/verify
+  // @route PATCH /blog/verify
   // @desc Verify blog
   // @access Private
   async verifyBlog(req, res) {
     try {
-      req.body.isVerified
-        ? await Blog.updateOne({ _id: req.body.blogId }, { isVerified: true })
-        : await Blog.delete({ _id: req.body.blogId });
+      const { isVerified, blogId } = req.body
 
-      return res.json({
+      isVerified
+        ? await Blog.updateOne({ _id: blogId }, { isVerified: true })
+        : await Blog.delete({ _id: blogId })
+
+      return res.status(200).json({
         success: true,
         message: 'Successfully!',
-      });
+      })
     } catch (error) {
-      console.log(error.message);
-      return res.json({
-        success: false,
-        message: 'Internal Error!',
-      });
+      console.error(error.message)
+      next(createError.InternalServerError())
     }
   }
 
-  // @route POST /blog/delete-soft
+  // @route DELETE /blog/delete-soft
   // @desc Delete soft blog by youtube blogId
   // @access Private
   async deleteBlogSoft(req, res) {
     try {
-      await Blog.delete({ _id: { $in: req.body.blogId } });
-      const blog = await Blog.find().sort({ createdAt: -1 });
+      const { blogId } = req.body
 
-      return res.json({
+      await Blog.delete({ _id: { $in: blogId } })
+      const blog = await Blog.find().sort({ createdAt: -1 })
+
+      return res.status(200).json({
         success: true,
         message: 'Delete Successfully!',
         blog,
-      });
+      })
     } catch (error) {
-      console.log(error.message);
-      return res.json({
+      console.error(error.message)
+      return res.status(500).json({
         success: false,
         message: 'Delete Failed!',
-      });
+      })
     }
   }
 
-  // @route POST /blog/add-popular
+  // @route PATCH /blog/add-popular
   // @desc Add blog to popular blog
   // @access Private
   async addBlogPopular(req, res) {
     try {
-      const blog = await Blog.findOneAndUpdate(
-        { _id: req.body.blogId },
-        {
-          $set: { isPopular: !req.body.isPopular },
-        }
-      ).sort({ createdAt: -1 });
+      const { blogId, isPopular } = req.body
 
-      return res.json({
+      const blog = await Blog.findOneAndUpdate(
+        { _id: blogId },
+        {
+          $set: { isPopular: !isPopular },
+        }
+      ).sort({ createdAt: -1 })
+
+      return res.status(200).json({
         success: true,
         message: 'Add Successfully!',
         blog,
-      });
+      })
     } catch (error) {
-      console.log(error.message);
-      return res.json({
+      console.error(error.message)
+      return res.status(500).json({
         success: false,
         message: 'Add Failed!',
-      });
+      })
     }
   }
 
@@ -78,66 +82,70 @@ class AdminController {
   // @access Private
   async createVideo(req, res) {
     try {
-      const video = await Video.create(req.body);
-      return res.json({
+      const video = await Video.create(req.body)
+      return res.status(200).json({
         success: true,
         message: 'Create Successfully!',
         video,
-      });
+      })
     } catch (error) {
-      console.log(error.message);
-      return res.json({
+      console.error(error.message)
+      return res.status(500).json({
         success: false,
         message: 'Create Failed!',
-      });
+      })
     }
   }
 
-  // @route POST /video/delete-soft
+  // @route DELETE /video/delete-soft
   // @desc Delete soft video by youtube videoId
   // @access Private
   async deleteVideoSoft(req, res) {
     try {
-      await Video.delete({ _id: { $in: req.body.videoId } });
-      const video = await Video.find().sort({ createdAt: -1 });
+      const { videoId } = req.body
 
-      return res.json({
+      await Video.delete({ _id: { $in: req.body.videoId } })
+      const video = await Video.find().sort({ createdAt: -1 })
+
+      return res.status(200).json({
         success: true,
         message: 'Delete Successfully!',
         video,
-      });
+      })
     } catch (error) {
-      console.log(error.message);
-      return res.json({
+      console.error(error.message)
+      return res.status(500).json({
         success: false,
         message: 'Delete Failed!',
-      });
+      })
     }
   }
 
-  // @route POST /video/add-popular
+  // @route PATCH /video/add-popular
   // @desc Add video to popular video
   // @access Private
   async addVideoPopular(req, res) {
     try {
-      const video = await Video.findOneAndUpdate(
-        { _id: req.body.videoId },
-        {
-          $set: { isPopular: !req.body.isPopular },
-        }
-      ).sort({ createdAt: -1 });
+      const { videoId, isPopular } = req.body
 
-      return res.json({
+      const video = await Video.findOneAndUpdate(
+        { _id: videoId },
+        {
+          $set: { isPopular: !isPopular },
+        }
+      ).sort({ createdAt: -1 })
+
+      return res.status(200).json({
         success: true,
         message: 'Add Popular Successfully!',
         video,
-      });
+      })
     } catch (error) {
-      console.log(error.message);
-      return res.json({
+      console.error(error.message)
+      return res.status(500).json({
         success: false,
         message: 'Add Popular Failed!',
-      });
+      })
     }
   }
 
@@ -150,21 +158,18 @@ class AdminController {
         Course.find(),
         Blog.find({ schedule: null, isPosted: true }).populate('postedBy'),
         Video.find().sort({ createdAt: -1 }),
-      ]);
+      ])
 
-      return res.json({
+      return res.status(200).json({
         course: data[0],
         blogs: data[1],
         videos: data[2],
-      });
+      })
     } catch (error) {
-      console.log(error.message);
-      return {
-        success: false,
-        message: 'Internal error!',
-      };
+      console.error(error.message)
+      next(createError.InternalServerError())
     }
   }
 }
 
-module.exports = new AdminController();
+module.exports = new AdminController()

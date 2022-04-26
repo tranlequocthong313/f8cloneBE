@@ -1,4 +1,4 @@
-const Video = require('../models/Video');
+const Video = require('../models/Video')
 
 class VideoController {
   // @route POST /video/create
@@ -6,18 +6,18 @@ class VideoController {
   // @access Private
   async createVideo(req, res) {
     try {
-      const video = await Video.create(req.body);
+      const video = await Video.create(req.body)
       return res.json({
         success: true,
         message: 'Create Successfully!',
         video,
-      });
+      })
     } catch (error) {
-      console.log(error.message);
+      console.error(error.message)
       return res.json({
         success: false,
         message: 'Create Failed!',
-      });
+      })
     }
   }
 
@@ -26,21 +26,22 @@ class VideoController {
   // @access Private
   async deleteSoft(req, res) {
     try {
-      console.log(req.body.videoId);
-      await Video.delete({ _id: { $in: req.body.videoId } });
-      const video = await Video.find().sort({ createdAt: -1 });
+      const { videoId } = req.body
+
+      await Video.delete({ _id: { $in: videoId } })
+      const video = await Video.find().sort({ createdAt: -1 })
 
       return res.json({
         success: true,
         message: 'Create Successfully!',
         video,
-      });
+      })
     } catch (error) {
-      console.log(error.message);
+      console.error(error.message)
       return res.json({
         success: false,
         message: 'Create Failed!',
-      });
+      })
     }
   }
 
@@ -49,26 +50,28 @@ class VideoController {
   // @access Private
   async addPopular(req, res) {
     try {
+      const { videoId, isPopular } = req.body
+
       const video = await Video.findOneAndUpdate(
-        { _id: req.body.videoId },
+        { _id: videoId },
         {
-          $set: { isPopular: !req.body.isPopular },
+          $set: { isPopular: !isPopular },
         }
-      ).sort({ createdAt: -1 });
+      ).sort({ createdAt: -1 })
 
       return res.json({
         success: true,
         message: 'Create Successfully!',
         video,
-      });
+      })
     } catch (error) {
-      console.log(error.message);
+      console.error(error.message)
       return res.json({
         success: false,
         message: 'Create Failed!',
-      });
+      })
     }
   }
 }
 
-module.exports = new VideoController();
+module.exports = new VideoController()

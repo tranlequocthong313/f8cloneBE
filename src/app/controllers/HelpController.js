@@ -1,80 +1,93 @@
-const Job = require('../models/Job');
-const Course = require('../models/Course');
-const Blog = require('../models/Blog');
-const Video = require('../models/Video');
-const User = require('../models/User');
-const Contact = require('../models/Contact');
+const Job = require('../models/Job')
+const Course = require('../models/Course')
+const Blog = require('../models/Blog')
+const Video = require('../models/Video')
+const User = require('../models/User')
+const Contact = require('../models/Contact')
+const createError = require('http-errors')
 
 class HelpController {
-  // @route POST /setting/fullName
+  // @route PATCH /setting/fullName
   // @desc Change fullName
   // @access Private
   async changeFullName(req, res) {
     try {
-      const fullName = await User.findOneAndUpdate(
-        { _id: req._id },
+      const { _id } = req
+      const { fullName } = req.body
+
+      const fullNameUpdated = await User.findOneAndUpdate(
+        { _id },
         {
-          $set: { fullName: req.body.fullName },
+          $set: { fullName },
         },
         { new: true }
-      ).select('fullName');
+      ).select('fullName')
 
-      return res.json(fullName);
+      return res.json(fullNameUpdated)
     } catch (error) {
-      console.log(error);
+      console.error(error.message)
+      next(createError.InternalServerError())
     }
   }
 
-  // @route POST /setting/avatar
+  // @route PATCH /setting/avatar
   // @desc Change avatar
   // @access Private
   async changeAvatar(req, res) {
     try {
+      const { _id } = req
+      const { photoURL } = req.body
+
       const avatar = await User.findOneAndUpdate(
-        { _id: req._id },
+        { _id },
         {
-          $set: { photoURL: req.body.photoURL },
+          $set: { photoURL },
         },
         { new: true }
-      ).select('photoURL');
+      ).select('photoURL')
 
-      return res.json(avatar);
+      return res.json(avatar)
     } catch (error) {
-      console.log(error);
+      console.error(error.message)
+      next(createError.InternalServerError())
     }
   }
 
-  // @route POST /setting/bio
+  // @route PATCH /setting/bio
   // @desc Change avatar
   // @access Private
   async changeBio(req, res) {
     try {
-      const bio = await User.findOneAndUpdate(
-        { _id: req._id },
+      const { _id } = req
+      const { bio } = req.body
+
+      const bioUpdated = await User.findOneAndUpdate(
+        { _id },
         {
-          $set: { bio: req.body.bio },
+          $set: { bio },
         },
         { new: true }
-      ).select('bio');
+      ).select('bio')
 
-      return res.json(bio);
+      return res.json(bioUpdated)
     } catch (error) {
-      console.log(error);
+      console.error(error.message)
+      next(createError.InternalServerError())
     }
   }
 
+  // @route PATCH /setting/social
+  // @desc Change social
+  // @access Private
   async changeSocial(req, res) {
     try {
-      const fb = req.body.fb;
-      const youtube = req.body.youtube;
-      const instagram = req.body.instagram;
-      const linkedin = req.body.linkedin;
-      const twitter = req.body.twitter;
+      const { _id } = req
+      const { fb, youtube, instagram, linkedin, twitter } = req.body
 
-      const social = await User.findById(req._id).select('socials');
+      const social = await User.findById(_id).select('socials')
 
       const socials = await User.findOneAndUpdate(
-        { _id: req._id },
+        { _id },
         {
           $set: {
             socials: {
@@ -87,13 +100,14 @@ class HelpController {
           },
         },
         { new: true }
-      ).select('socials');
+      ).select('socials')
 
-      console.log(socials);
+      console.log(socials)
 
-      return res.json(socials);
+      return res.json(socials)
     } catch (error) {
-      console.log(error);
+      console.error(error.message)
+      next(createError.InternalServerError())
     }
   }
 
@@ -102,18 +116,20 @@ class HelpController {
   // @access Private
   async getMyPost(req, res) {
     try {
-      const myBlog = await Blog.find({
-        postedBy: req._id,
-        isPosted: true,
-      }).sort({ createdAt: -1 });
+      const { _id } = req
 
-      return res.json(myBlog);
+      const myBlog = await Blog.find({
+        postedBy: _id,
+        isPosted: true,
+      }).sort({ createdAt: -1 })
+
+      return res.json(myBlog)
     } catch (error) {
-      console.log(error.message);
+      console.error(error.message)
       return res.json({
         success: false,
         message: 'Get my blog failed!',
-      });
+      })
     }
   }
 
@@ -122,19 +138,15 @@ class HelpController {
   // @access Public
   async newJob(req, res) {
     try {
-      const jobData = {
-        title: req.body.title,
-        minSalary: req.body.minSalary,
-        maxSalary: req.body.maxSalary,
-        languages: req.body.languages,
+      const jobs = await Job.create({
+        ...req.body,
         postedBy: req._id,
-      };
+      })
 
-      const jobs = await Job.create(jobData);
-
-      return res.json(jobs);
+      return res.json(jobs)
     } catch (error) {
-      console.log(error.message);
+      console.error(error.message)
+      next(createError.InternalServerError())
     }
   }
 
@@ -143,11 +155,12 @@ class HelpController {
   // @access Public
   async getJob(req, res) {
     try {
-      const jobs = await Job.find();
+      const jobs = await Job.find()
 
-      return res.json(jobs);
+      return res.json(jobs)
     } catch (error) {
-      console.log(error.message);
+      console.error(error.message)
+      next(createError.InternalServerError())
     }
   }
 
@@ -155,24 +168,25 @@ class HelpController {
   // @desc Search
   // @access Public
   async search(req, res) {
-    console.log(req.params.text);
     try {
+      const { text } = req.params
+
       const data = await Promise.all([
         Course.find({
           $or: [
             {
               title: {
-                $regex: new RegExp('.*' + req.params.text + '.*', 'i'),
+                $regex: new RegExp('.*' + text + '.*', 'i'),
               },
             },
             {
               search: {
-                $regex: new RegExp('.*' + req.params.text + '.*', 'i'),
+                $regex: new RegExp('.*' + text + '.*', 'i'),
               },
             },
             {
               description: {
-                $regex: new RegExp('.*' + req.params.text + '.*', 'i'),
+                $regex: new RegExp('.*' + text + '.*', 'i'),
               },
             },
           ],
@@ -181,17 +195,17 @@ class HelpController {
           $or: [
             {
               titleDisplay: {
-                $regex: new RegExp('.*' + req.params.text + '.*', 'i'),
+                $regex: new RegExp('.*' + text + '.*', 'i'),
               },
             },
             {
               search: {
-                $regex: new RegExp('.*' + req.params.text + '.*', 'i'),
+                $regex: new RegExp('.*' + text + '.*', 'i'),
               },
             },
             {
               content: {
-                $regex: new RegExp('.*' + req.params.text + '.*', 'i'),
+                $regex: new RegExp('.*' + text + '.*', 'i'),
               },
             },
           ],
@@ -202,25 +216,26 @@ class HelpController {
           $or: [
             {
               title: {
-                $regex: new RegExp('.*' + req.params.text + '.*', 'i'),
+                $regex: new RegExp('.*' + text + '.*', 'i'),
               },
             },
             {
               search: {
-                $regex: new RegExp('.*' + req.params.text + '.*', 'i'),
+                $regex: new RegExp('.*' + text + '.*', 'i'),
               },
             },
           ],
         }).select('_id videoId title image'),
-      ]);
+      ])
 
       return res.json({
         courses: data[0],
         blogs: data[1],
         videos: data[2],
-      });
+      })
     } catch (error) {
-      console.log(error.message);
+      console.error(error.message)
+      next(createError.InternalServerError())
     }
   }
 
@@ -229,16 +244,17 @@ class HelpController {
   // @access Public
   async contact(req, res) {
     try {
-      const contact = await Contact.create(req.body);
+      const contact = await Contact.create(req.body)
       return res.json({
         success: true,
         message: 'Post success',
         contact,
-      });
+      })
     } catch (error) {
-      console.log(error);
+      console.error(error.message)
+      next(createError.InternalServerError())
     }
   }
 }
 
-module.exports = new HelpController();
+module.exports = new HelpController()

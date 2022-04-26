@@ -1,8 +1,7 @@
-const Course = require('../models/Course');
-const Blog = require('../models/Blog');
-const Video = require('../models/Video');
-const Notification = require('../models/Notification');
-const cache = require('../../utils/Cache');
+const Course = require('../models/Course')
+const Blog = require('../models/Blog')
+const Video = require('../models/Video')
+const Notification = require('../models/Notification')
 
 class NotificationController {
   // @route POST /new-notification
@@ -10,39 +9,45 @@ class NotificationController {
   // @access Private
   async newNotify(req, res) {
     try {
-      await Notification.create(req.body);
+      const { sendFor } = req.body
+
+      await Notification.create(req.body)
 
       const notification = await Notification.find({
-        sendFor: req.body.sendFor,
+        sendFor,
       })
         .populate('notifiedBy')
-        .sort({ createdAt: -1 });
+        .sort({ createdAt: -1 })
 
-      return res.json(notification);
+      return res.json(notification)
     } catch (error) {
-      console.log(error.message);
+      console.error(error.message)
+      next(createError.InternalServerError())
     }
   }
 
-  // @route POST /seen-notification
+  // @route PUT /seen-notification
   // @desc Seen notification
   // @access Private
   async seenNotification(req, res) {
     try {
-      console.log(req.body.notificationId);
+      const { notificationId } = req.body
+      const { _id } = req
+
       await Notification.updateMany(
         {
-          _id: { $in: req.body.notificationId },
+          _id: { $in: notificationId },
         },
         { $set: { isSeen: true } }
-      );
-      const notification = await Notification.find({ sendFor: req._id })
+      )
+      const notification = await Notification.find({ sendFor: _id })
         .populate('notifiedBy')
-        .sort({ createdAt: -1 });
+        .sort({ createdAt: -1 })
 
-      res.json(notification);
+      res.json(notification)
     } catch (error) {
-      console.log(error.message);
+      console.error(error.message)
+      next(createError.InternalServerError())
     }
   }
 
@@ -51,17 +56,20 @@ class NotificationController {
   // @access Private
   async getNotification(req, res) {
     try {
+      const { _id } = req
+
       const notification = await Notification.find({
-        sendFor: req._id,
+        sendFor: _id,
       })
         .populate('notifiedBy')
-        .sort({ createdAt: -1 });
+        .sort({ createdAt: -1 })
 
-      res.json(notification);
+      res.json(notification)
     } catch (error) {
-      console.log(error.message);
+      console.error(error.message)
+      next(createError.InternalServerError())
     }
   }
 }
 
-module.exports = new NotificationController();
+module.exports = new NotificationController()

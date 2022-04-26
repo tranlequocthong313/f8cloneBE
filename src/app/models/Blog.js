@@ -63,7 +63,7 @@ const BlogSchema = new Schema(
   },
   {
     timestamps: true,
-  },
+  }
 )
 
 BlogSchema.plugin(mongooseDelete, {

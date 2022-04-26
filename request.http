@@ -1,14 +1,4 @@
-GET http://localhost:5000/help/my-post
-
-###
-
-GET http://localhost:5000/abc
-
-###
-
-POST http://localhost:5000/login/check-email
+GET  http://localhost:5000/
 Content-Type: 'application/json'
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjVhYzU1YzdkNTRmNTJmNGFhMmFlY2QiLCJpYXQiOjE2NTA1NTA0ODB9.ZL3VgePRhK84aFONLdOZxbYX5MkAnAlcaUBJMP0LS4A
 
-{
-    "email": "tranlequocthong313@gmai.com"
-}

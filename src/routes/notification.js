@@ -4,10 +4,10 @@ const NotificationController = require('../app/controllers/NotificationControlle
 const verifyToken = require('../middleware/verifyToken')
 
 router.post('/new-notification', NotificationController.newNotify)
-router.post(
+router.put(
   '/seen-notification',
   verifyToken,
-  NotificationController.seenNotification,
+  NotificationController.seenNotification
 )
 router.get('/', verifyToken, NotificationController.getNotification)
 

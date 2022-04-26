@@ -1,14 +1,15 @@
-const Course = require('../models/Course');
-const Blog = require('../models/Blog');
-const Video = require('../models/Video');
-const cache = require('../../utils/Cache');
+const Course = require('../models/Course')
+const Blog = require('../models/Blog')
+const Video = require('../models/Video')
+const createError = require('http-errors')
 
 class SiteController {
   // @route GET /
   // @desc Get data
   // @access Public
-  async index(req, res) {
+  async index(req, res, next) {
     try {
+      a
       const data = await Promise.all([
         Course.find({ 'role.FE': 'Front-end' }).select(
           '_id slug image title studentCount'
@@ -24,22 +25,19 @@ class SiteController {
         Video.find({
           isPopular: true,
         }).sort({ createdAt: -1 }),
-      ]);
+      ])
 
       return res.json({
         courseFE: data[0],
         courseBE: data[1],
         blogs: data[2],
         videos: data[3],
-      });
+      })
     } catch (error) {
-      console.log(error.message);
-      return {
-        success: false,
-        message: 'Internal error!',
-      };
+      console.error(error.message)
+      next(createError.InternalServerError())
     }
   }
 }
 
-module.exports = new SiteController();
+module.exports = new SiteController()
