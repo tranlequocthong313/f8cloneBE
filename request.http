@@ -1,4 +1,2 @@
-GET  http://localhost:5000/
-Content-Type: 'application/json'
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjVhYzU1YzdkNTRmNTJmNGFhMmFlY2QiLCJpYXQiOjE2NTA1NTA0ODB9.ZL3VgePRhK84aFONLdOZxbYX5MkAnAlcaUBJMP0LS4A
+GET  https://f8clone.herokuapp.com/
 
