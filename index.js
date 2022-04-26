@@ -16,6 +16,8 @@ const io = require('socket.io')(http, {
   },
 })
 
+db.connect()
+
 app.use(helmet())
 
 app.use(
@@ -35,14 +37,6 @@ app.use(
 
 app.use(express.json())
 
-db.connect()
-
-io.on('connection', (socket) => {
-  socket.on('comment', (comment) => {
-    io.emit('comment', comment)
-  })
-})
-
 route(app)
 
 app.use((req, res, next) => next(createError.NotFound('Not Found')))
@@ -54,6 +48,12 @@ app.use((err, req, res, next) => {
   return res.status(errStatus).json({
     status: errStatus,
     message: err.message,
+  })
+})
+
+io.on('connection', (socket) => {
+  socket.on('comment', (comment) => {
+    io.emit('comment', comment)
   })
 })
 
