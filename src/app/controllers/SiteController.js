@@ -9,7 +9,6 @@ class SiteController {
   // @access Public
   async index(req, res, next) {
     try {
-      a
       const data = await Promise.all([
         Course.find({ 'role.FE': 'Front-end' }).select(
           '_id slug image title studentCount'
