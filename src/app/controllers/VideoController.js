@@ -4,7 +4,7 @@ class VideoController {
   // @route POST /video/create
   // @desc Create video by youtube videoId
   // @access Private
-  async createVideo(req, res) {
+  async createVideo(req, res, next) {
     try {
       const video = await Video.create(req.body)
       return res.json({
@@ -24,7 +24,7 @@ class VideoController {
   // @route POST /video/delete-soft
   // @desc Delete soft video by youtube videoId
   // @access Private
-  async deleteSoft(req, res) {
+  async deleteSoft(req, res, next) {
     try {
       const { videoId } = req.body
 
@@ -48,7 +48,7 @@ class VideoController {
   // @route POST /video/add-popular
   // @desc Add video to popular video
   // @access Private
-  async addPopular(req, res) {
+  async addPopular(req, res, next) {
     try {
       const { videoId, isPopular } = req.body
 

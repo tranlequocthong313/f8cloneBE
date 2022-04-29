@@ -17,7 +17,6 @@ router.post('/email-password', userController.login)
 router.post('/reset-password', userController.resetPassword)
 router.post('/verify', userController.verify)
 router.get('/auth', verifyToken, userController.getUser)
-router.get('/:slug', userController.getUserBySlug)
 router.post('/', userController.register)
 
 module.exports = router

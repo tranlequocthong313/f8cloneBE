@@ -7,9 +7,11 @@ class AdminController {
   // @route PATCH /blog/verify
   // @desc Verify blog
   // @access Private
-  async verifyBlog(req, res) {
+  async verifyBlog(req, res, next) {
     try {
       const { isVerified, blogId } = req.body
+
+      console.log(isVerified)
 
       isVerified
         ? await Blog.updateOne({ _id: blogId }, { isVerified: true })
@@ -28,7 +30,7 @@ class AdminController {
   // @route DELETE /blog/delete-soft
   // @desc Delete soft blog by youtube blogId
   // @access Private
-  async deleteBlogSoft(req, res) {
+  async deleteBlogSoft(req, res, next) {
     try {
       const { blogId } = req.body
 
@@ -52,7 +54,7 @@ class AdminController {
   // @route PATCH /blog/add-popular
   // @desc Add blog to popular blog
   // @access Private
-  async addBlogPopular(req, res) {
+  async addBlogPopular(req, res, next) {
     try {
       const { blogId, isPopular } = req.body
 
@@ -80,7 +82,7 @@ class AdminController {
   // @route POST /video/create
   // @desc Create video by youtube videoId
   // @access Private
-  async createVideo(req, res) {
+  async createVideo(req, res, next) {
     try {
       const video = await Video.create(req.body)
       return res.status(200).json({
@@ -100,7 +102,7 @@ class AdminController {
   // @route DELETE /video/delete-soft
   // @desc Delete soft video by youtube videoId
   // @access Private
-  async deleteVideoSoft(req, res) {
+  async deleteVideoSoft(req, res, next) {
     try {
       const { videoId } = req.body
 
@@ -124,7 +126,7 @@ class AdminController {
   // @route PATCH /video/add-popular
   // @desc Add video to popular video
   // @access Private
-  async addVideoPopular(req, res) {
+  async addVideoPopular(req, res, next) {
     try {
       const { videoId, isPopular } = req.body
 
@@ -152,7 +154,7 @@ class AdminController {
   // @route GET /
   // @desc Get data
   // @access Private
-  async getData(req, res) {
+  async getData(req, res, next) {
     try {
       const data = await Promise.all([
         Course.find(),

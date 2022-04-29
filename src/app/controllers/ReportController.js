@@ -4,7 +4,7 @@ class ReportController {
   // @route PUT /report/blog
   // @desc Report a blog
   // @access Private
-  async reportBlog(req, res) {
+  async reportBlog(req, res, next) {
     try {
       return res.json({
         success: true,
@@ -22,7 +22,7 @@ class ReportController {
   // @route PUT /report/comment
   // @desc Report a comment
   // @access Private
-  async reportComment(req, res) {
+  async reportComment(req, res, next) {
     try {
       const { _id } = req
       const { commentId } = req.body

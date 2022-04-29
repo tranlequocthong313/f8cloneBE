@@ -11,7 +11,7 @@ class UserController {
   // @route GET api/auth
   // @desc Check if user is logged in
   // @access Public
-  async getUser(req, res) {
+  async getUser(req, res, next) {
     try {
       const { _id } = req
       let user = await User.findById({ _id })
@@ -28,7 +28,7 @@ class UserController {
   // @route POST /register
   // @desc Register
   // @access Public
-  async register(req, res) {
+  async register(req, res, next) {
     const { fullName, password, phoneNumber } = req.body
 
     try {
@@ -85,7 +85,7 @@ class UserController {
   // @route POST /login/email-password
   // @desc Login with email and password
   // @access Public
-  async login(req, res) {
+  async login(req, res, next) {
     try {
       const { email, password } = req.body
 
@@ -127,12 +127,11 @@ class UserController {
   // @route POST /login/provider
   // @desc Login with provider
   // @access Public
-  async loginWithProvider(req, res) {
+  async loginWithProvider(req, res, next) {
     try {
       const { phoneNumber, email, fullName } = req.body
 
-      const hasPhoneNumber = phoneNumber
-      if (hasPhoneNumber) {
+      if (phoneNumber) {
         try {
           const user = await User.findOne({
             phoneNumber,
@@ -169,8 +168,8 @@ class UserController {
         )
 
         return res.json({
-          hasUserCreatedAlready: true,
-          message: 'Email has been used!',
+          success: true,
+          message: 'Login successfully!',
           userCreated,
           accessToken,
         })
@@ -219,7 +218,7 @@ class UserController {
   // @route POST /register/verify
   // @desc Send email verification
   // @access Public
-  async verify(req, res) {
+  async verify(req, res, next) {
     const { email, option, otp } = req.body
 
     try {
@@ -252,7 +251,7 @@ class UserController {
   // @route POST /login/check-email
   // @desc Check user email exist
   // @access Public
-  async checkEmail(req, res) {
+  async checkEmail(req, res, next) {
     try {
       const { email } = req.body
 
@@ -274,7 +273,7 @@ class UserController {
   // @route POST /login/phone-number
   // @desc Check user phone number exist
   // @access Public
-  async checkPhoneNumberExist(req, res) {
+  async checkPhoneNumberExist(req, res, next) {
     try {
       const { phoneNumber } = req.body
 
@@ -298,7 +297,7 @@ class UserController {
   // @route POST /login/reset-password
   // @desc Reset password
   // @access Public
-  async resetPassword(req, res) {
+  async resetPassword(req, res, next) {
     try {
       const { password, email } = req.body
 
@@ -323,7 +322,7 @@ class UserController {
   // @route PATCH /me/bookmark
   // @desc Bookmark post
   // @access Private
-  async bookmark(req, res) {
+  async bookmark(req, res, next) {
     try {
       const { _id } = req
       const { blogId } = req.body
@@ -361,7 +360,7 @@ class UserController {
   // @route GET me/bookmark
   // @desc Get bookmark post
   // @access Private
-  async getBookmark(req, res) {
+  async getBookmark(req, res, next) {
     try {
       const { _id } = req
 
@@ -377,7 +376,7 @@ class UserController {
   // @route GET me/bookmark-post
   // @desc Get bookmark post and author name
   // @access Private
-  async getBookmarkAndBlogAuthor(req, res) {
+  async getBookmarkAndBlogAuthor(req, res, next) {
     try {
       const { _id } = req
 
@@ -390,24 +389,6 @@ class UserController {
         .populate('postedBy', '_id fullName')
 
       return res.json(bookmark)
-    } catch (error) {
-      console.error(error.message)
-      next(createError.InternalServerError())
-    }
-  }
-
-  // @route GET me/:slug
-  // @desc Get user by slug
-  // @access Public
-  async getUserBySlug(req, res) {
-    try {
-      const { slug } = req.params
-
-      const user = await User.findOne({
-        slug,
-      })
-
-      res.json(user)
     } catch (error) {
       console.error(error.message)
       next(createError.InternalServerError())

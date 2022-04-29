@@ -9,16 +9,40 @@ const createError = require('http-errors')
 const helmet = require('helmet')
 const logEvents = require('./src/helper/logEvents')
 const app = express()
-const http = require('http').createServer(app)
-const io = require('socket.io')(http, {
+const socketHandlers = require('./src/helper/socket')
+const session = require('express-session')
+const { createServer } = require('http')
+const { Server } = require('socket.io')
+const httpServer = createServer(app)
+
+const io = new Server(httpServer, {
   cors: {
-    origin: '*',
+    origin: `*`,
+    methods: ['GET', 'POST'],
   },
 })
 
-app.use(helmet())
+socketHandlers(io)
+
+const PORT = process.env.PORT || 5000
+
+app.set('trust proxy', 1)
+
+app.use(
+  session({
+    secret: process.env.ACCESS_SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+      secure: process.env.NODE_ENV === 'development' ? false : true,
+      httpOnly: process.env.NODE_ENV === 'development' ? false : true,
+    },
+  })
+)
 
 app.use(cors())
+
+app.use(helmet())
 
 app.use(
   compression({
@@ -49,13 +73,6 @@ app.use((err, req, res, next) => {
   })
 })
 
-io.on('connection', (socket) => {
-  socket.on('comment', (comment) => {
-    io.emit('comment', comment)
-  })
-})
-
 db.connect()
 
-const PORT = process.env.PORT || 5000
-http.listen(PORT, () => `Server started on port ${PORT}`)
+httpServer.listen(PORT, () => `Server started on port ${PORT}`)

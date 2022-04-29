@@ -10,7 +10,7 @@ class HelpController {
   // @route PATCH /setting/fullName
   // @desc Change fullName
   // @access Private
-  async changeFullName(req, res) {
+  async changeFullName(req, res, next) {
     try {
       const { _id } = req
       const { fullName } = req.body
@@ -33,7 +33,7 @@ class HelpController {
   // @route PATCH /setting/avatar
   // @desc Change avatar
   // @access Private
-  async changeAvatar(req, res) {
+  async changeAvatar(req, res, next) {
     try {
       const { _id } = req
       const { photoURL } = req.body
@@ -56,7 +56,7 @@ class HelpController {
   // @route PATCH /setting/bio
   // @desc Change avatar
   // @access Private
-  async changeBio(req, res) {
+  async changeBio(req, res, next) {
     try {
       const { _id } = req
       const { bio } = req.body
@@ -79,7 +79,7 @@ class HelpController {
   // @route PATCH /setting/social
   // @desc Change social
   // @access Private
-  async changeSocial(req, res) {
+  async changeSocial(req, res, next) {
     try {
       const { _id } = req
       const { fb, youtube, instagram, linkedin, twitter } = req.body
@@ -114,7 +114,7 @@ class HelpController {
   // @route GET /my-post
   // @desc Get my blog
   // @access Private
-  async getMyPost(req, res) {
+  async getMyPost(req, res, next) {
     try {
       const { _id } = req
 
@@ -136,7 +136,7 @@ class HelpController {
   // @route POST /new-job
   // @desc Post new job
   // @access Public
-  async newJob(req, res) {
+  async newJob(req, res, next) {
     try {
       const jobs = await Job.create({
         ...req.body,
@@ -153,7 +153,7 @@ class HelpController {
   // @route GET /get-job
   // @desc Get all job
   // @access Public
-  async getJob(req, res) {
+  async getJob(req, res, next) {
     try {
       const jobs = await Job.find()
 
@@ -167,7 +167,7 @@ class HelpController {
   // @route GET /search/:text
   // @desc Search
   // @access Public
-  async search(req, res) {
+  async search(req, res, next) {
     try {
       const { text } = req.params
 
@@ -209,6 +209,9 @@ class HelpController {
               },
             },
           ],
+          isPosted: true,
+          isVerified: true,
+          schedule: null,
         })
           .select('_id slug titleDisplay image likes comments')
           .populate('postedBy', 'photoURL'),
@@ -242,7 +245,7 @@ class HelpController {
   // @route POST /help/contact
   // @desc Post Contact
   // @access Public
-  async contact(req, res) {
+  async contact(req, res, next) {
     try {
       const contact = await Contact.create(req.body)
       return res.json({

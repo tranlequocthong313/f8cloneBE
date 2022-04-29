@@ -2,12 +2,13 @@ const Blog = require('../models/Blog')
 const User = require('../models/User')
 const handleSchedule = require('node-schedule')
 const createError = require('http-errors')
+const Comment = require('../models/Comment')
 
 class BlogController {
   // @route POST /new-post
   // @desc Post new blog
   // @access Private
-  async postNewBlog(req, res) {
+  async postNewBlog(req, res, next) {
     try {
       const { schedule } = req.body
 
@@ -48,7 +49,7 @@ class BlogController {
   // @route GET /blog
   // @desc Get all blog
   // @access Public
-  async getAllBlog(req, res) {
+  async getAllBlog(req, res, next) {
     try {
       const allBlog = await Blog.find({
         schedule: null,
@@ -68,25 +69,20 @@ class BlogController {
     }
   }
 
-  // @route GET /blog/:slug || /blog/edit-blog/:slug
-  // @desc Get blog by slug
+  // @route GET /blog/:_id || /blog/edit-blog/:_id
+  // @desc Get blog by id
   // @access Public
-  async getBlog(req, res) {
+  async getBlog(req, res, next) {
     try {
-      const { slug } = req.params
+      const { _id } = req.params
 
       const blogData = await Promise.all([
         Blog.findOne({
-          slug,
+          _id,
           schedule: null,
           isPosted: true,
-        })
-          .populate('postedBy')
-          .populate('comments.postedBy'),
-        Blog.find({ isPopular: true, isPosted: true }).populate(
-          'postedBy',
-          '_id fullName bio photoURL'
-        ),
+        }).populate('postedBy'),
+        Blog.find({ isPopular: true, isPosted: true }).populate('postedBy'),
       ])
 
       return res.status(200).json({
@@ -102,7 +98,7 @@ class BlogController {
   // @route GET /blog/tag/:tag
   // @desc Get blog by tag
   // @access Public
-  async getBlogTag(req, res) {
+  async getBlogTag(req, res, next) {
     try {
       const { tag } = req.params
 
@@ -122,10 +118,10 @@ class BlogController {
     }
   }
 
-  // @route GET /blog/edit-blog/:slug
+  // @route GET /blog/edit-blog/:_id
   // @desc Get edit blog
   // @access Private
-  async getEditBlog(req, res) {
+  async getEditBlog(req, res, next) {
     try {
       const { _id } = req.params
 
@@ -138,10 +134,10 @@ class BlogController {
     }
   }
 
-  // @route PUT /blog/edit-blog/:slug
+  // @route PUT /blog/edit-blog/:_id
   // @desc Edit blog
   // @access Private
-  async editBlog(req, res) {
+  async editBlog(req, res, next) {
     try {
       const { _id } = req.params
       const { title, content } = req.body
@@ -172,7 +168,7 @@ class BlogController {
   // @route DELETE /blog/delete-blog
   // @desc Delete blog
   // @access Private
-  async deleteBlog(req, res) {
+  async deleteBlog(req, res, next) {
     try {
       const { _id } = req
       const { blogId } = req.params
@@ -191,7 +187,7 @@ class BlogController {
   // @route GET /blog/same-author/:id
   // @desc Get bog same author
   // @access Public
-  async getBlogSameAuthor(req, res) {
+  async getBlogSameAuthor(req, res, next) {
     try {
       const { authorId, blogId } = req.params
 
@@ -200,7 +196,7 @@ class BlogController {
         _id: { $ne: blogId },
         schedule: null,
         isPosted: true,
-      }).select('slug titleDisplay')
+      }).select('titleDisplay')
 
       return res.status(200).json(blogSameAuthor)
     } catch (error) {
@@ -212,91 +208,56 @@ class BlogController {
     }
   }
 
-  // @route PATCH /blog/like
+  // @route PATCH /blog/like/:blogId
   // @desc Like blog
   // @access Private
-  async like(req, res) {
+  async like(req, res, next) {
     try {
       const { _id } = req
-      const { blogId } = req.body
+      const { blogId } = req.params
 
-      const liked = await Blog.where('_id').equals(blogId).select('likes')
-
-      const isLikedBlog = liked[0].likes.includes(_id)
-      if (isLikedBlog) {
-        const likes = await Blog.findByIdAndUpdate(
-          blogId,
-          {
-            $pull: { likes: _id },
-          },
-          { new: true }
-        ).select('likes slug postedBy')
-
-        return res.status(200).json(likes)
-      }
       const likes = await Blog.findByIdAndUpdate(
         blogId,
         {
-          $push: { likes: { $each: [_id], $position: 0 } },
+          $push: { likes: _id },
         },
         { new: true }
-      ).select('likes slug postedBy')
+      ).select('likes')
 
       return res.status(200).json(likes)
     } catch (error) {
       console.error(error.message)
-      return res.status(500).json({
-        success: false,
-        message: 'Like failed!',
-      })
+      next(createError.InternalServerError())
     }
   }
 
-  // @route PUT /comment
-  // @desc Comment blog
+  // @route PATCH /blog/unlike/:blogId
+  // @desc Unlike blog
   // @access Private
-  async comment(req, res) {
+  async unlike(req, res, next) {
     try {
-      const { _id } = req._id
+      const { _id } = req
+      const { blogId } = req.params
 
-      const comments = await Blog.findOneAndUpdate(
+      const likes = await Blog.findByIdAndUpdate(
+        blogId,
         {
-          _id: req.body.blogId,
+          $pull: { likes: _id },
         },
-        {
-          $push: {
-            comments: {
-              $each: [
-                {
-                  ...req.body,
-                  postedBy: _id,
-                },
-              ],
-              $position: 0,
-            },
-          },
-        },
-        {
-          new: true,
-        }
-      )
-        .select('comments')
-        .populate('comments.postedBy', '_id fullName photoURL')
+        { new: true }
+      ).select('likes')
 
-      return res.status(200).json(comments)
+      return res.status(200).json(likes)
     } catch (error) {
       console.error(error.message)
-      return res.status(500).json({
-        success: false,
-        message: 'Comment failed!',
-      })
+      next(createError.InternalServerError())
     }
   }
 
   // @route GET /get-reply
   // @desc Get reply comment
   // @access Private
-  async getReplyComment(req, res) {
+  async getReplyComment(req, res, next) {
     try {
       const { blogId, commentId } = req.params
 
@@ -318,7 +279,7 @@ class BlogController {
   // @route PUT /reply
   // @desc Reply comment
   // @access Private
-  async replyComment(req, res) {
+  async replyComment(req, res, next) {
     try {
       const { _id } = req
       const { blogId, commentId } = req.body
@@ -359,7 +320,7 @@ class BlogController {
   // @route PUT /comment/react
   // @desc React comment
   // @access Private
-  async reactComment(req, res) {
+  async reactComment(req, res, next) {
     try {
       const { _id } = req
       const { commentId, emoji } = req.body
@@ -395,7 +356,7 @@ class BlogController {
   // @route PUT blog/comment/edit
   // @desc Edit comment
   // @access Private
-  async editComment(req, res) {
+  async editComment(req, res, next) {
     try {
       const { commentId, conetnt, isCode } = req.body
 
@@ -425,7 +386,7 @@ class BlogController {
   // @route PUT blog/comment/delete
   // @desc Delete comment
   // @access Private
-  async deleteComment(req, res) {
+  async deleteComment(req, res, next) {
     const { commentId } = req.body
 
     try {

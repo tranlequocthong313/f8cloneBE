@@ -5,6 +5,7 @@ const blogRouter = require('./blog')
 const adminRouter = require('./admin.js')
 const reportRouter = require('./report')
 const helpRouter = require('./help')
+const commentRouter = require('./comment')
 const notificationRouter = require('./notification')
 
 const route = (app) => {
@@ -20,6 +21,7 @@ const route = (app) => {
   app.use('/help', helpRouter)
   app.use('/search', helpRouter)
   app.use('/admin', adminRouter)
+  app.use('/comment', commentRouter)
   app.use('/notification', notificationRouter)
   app.use('/', siteRouter)
 }

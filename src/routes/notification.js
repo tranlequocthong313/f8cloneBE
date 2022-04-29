@@ -4,7 +4,7 @@ const NotificationController = require('../app/controllers/NotificationControlle
 const verifyToken = require('../middleware/verifyToken')
 
 router.post('/new-notification', NotificationController.newNotify)
-router.put(
+router.delete(
   '/seen-notification',
   verifyToken,
   NotificationController.seenNotification

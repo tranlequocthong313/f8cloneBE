@@ -6,33 +6,6 @@ const mongooseDelete = require('mongoose-delete')
 
 mongoose.plugin(slug)
 
-const commentSchema = {
-  content: String,
-  postedBy: { type: ObjectId, ref: 'users' },
-  createdAt: { type: Date, default: () => Date.now(), immutable: true },
-  isCode: { type: Boolean, default: false },
-  reacts: [
-    {
-      reactedBy: { type: ObjectId, ref: 'users' },
-      emoji: String,
-    },
-  ],
-  replies: [
-    {
-      content: String,
-      postedBy: { type: ObjectId, ref: 'users' },
-      createdAt: { type: Date, default: () => Date.now(), immutable: true },
-      isCode: { type: Boolean, default: false },
-      reacts: [
-        {
-          reactedBy: { type: ObjectId, ref: 'users' },
-          emoji: String,
-        },
-      ],
-    },
-  ],
-}
-
 const BlogSchema = new Schema(
   {
     title: { type: String },
@@ -43,14 +16,7 @@ const BlogSchema = new Schema(
     titleDisplay: String,
     description: String,
     tags: [{ type: String, max: 5 }],
-    slug: {
-      type: String,
-      slug: 'title',
-      slugPaddingSize: 4,
-      unique: true,
-    },
     likes: [{ type: ObjectId, ref: 'users' }],
-    comments: [commentSchema],
     schedule: String,
     postedBy: {
       type: ObjectId,
@@ -60,6 +26,7 @@ const BlogSchema = new Schema(
     isPopular: Boolean,
     isVerified: Boolean,
     isPosted: { type: Boolean, default: false },
+    comments: [{ type: ObjectId, ref: 'comments' }],
   },
   {
     timestamps: true,

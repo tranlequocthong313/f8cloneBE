@@ -5,7 +5,7 @@ class CourseController {
   // @route GET /courses/:slug
   // @desc Get course by slug
   // @access Public
-  async getCourse(req, res) {
+  async getCourse(req, res, next) {
     try {
       const { id } = req.query
       const { slug } = req.params
@@ -36,7 +36,7 @@ class CourseController {
   // @route GET /courses
   // @desc Get all course by role
   // @access Public
-  async getCourseByRole(req, res) {
+  async getCourseByRole(req, res, next) {
     try {
       const data = await Promise.all([
         Course.find({ 'role.FE': 'Front-end' }).select(

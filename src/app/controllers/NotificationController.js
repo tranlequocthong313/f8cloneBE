@@ -2,23 +2,15 @@ const Course = require('../models/Course')
 const Blog = require('../models/Blog')
 const Video = require('../models/Video')
 const Notification = require('../models/Notification')
+const createError = require('http-errors')
 
 class NotificationController {
   // @route POST /new-notification
   // @desc Post new notification
   // @access Private
-  async newNotify(req, res) {
+  async newNotify(req, res, next) {
     try {
-      const { sendFor } = req.body
-
-      await Notification.create(req.body)
-
-      const notification = await Notification.find({
-        sendFor,
-      })
-        .populate('notifiedBy')
-        .sort({ createdAt: -1 })
-
+      const notification = await Notification.create(req.body)
       return res.json(notification)
     } catch (error) {
       console.error(error.message)
@@ -26,25 +18,23 @@ class NotificationController {
     }
   }
 
-  // @route PUT /seen-notification
+  // @route DELETE /seen-notification
   // @desc Seen notification
   // @access Private
-  async seenNotification(req, res) {
+  async seenNotification(req, res, next) {
     try {
       const { notificationId } = req.body
       const { _id } = req
 
-      await Notification.updateMany(
-        {
-          _id: { $in: notificationId },
-        },
-        { $set: { isSeen: true } }
-      )
-      const notification = await Notification.find({ sendFor: _id })
-        .populate('notifiedBy')
-        .sort({ createdAt: -1 })
+      await Notification.deleteMany({
+        _id: { $in: notificationId },
+      })
 
-      res.json(notification)
+      const notification = await Notification.find({
+        receiverId: _id,
+      }).sort({ createdAt: -1 })
+
+      return res.json(notification)
     } catch (error) {
       console.error(error.message)
       next(createError.InternalServerError())
@@ -54,17 +44,15 @@ class NotificationController {
   // @route GET /
   // @desc Get notification
   // @access Private
-  async getNotification(req, res) {
+  async getNotification(req, res, next) {
     try {
       const { _id } = req
 
       const notification = await Notification.find({
-        sendFor: _id,
-      })
-        .populate('notifiedBy')
-        .sort({ createdAt: -1 })
+        receiverId: _id,
+      }).sort({ createdAt: -1 })
 
-      res.json(notification)
+      return res.json(notification)
     } catch (error) {
       console.error(error.message)
       next(createError.InternalServerError())
