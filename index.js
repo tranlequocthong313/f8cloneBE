@@ -17,7 +17,10 @@ const { Server } = require('socket.io')
 const httpServer = createServer(app)
 const io = new Server(httpServer, {
   cors: {
-    origin: `*`,
+    origin:
+      process.env.NODE_ENV === 'development'
+        ? 'http://localhost:3000/'
+        : 'https://f8clone.tk/',
   },
 })
 socketHandlers(io)
@@ -26,7 +29,7 @@ db.connect()
 
 app.use(cors())
 app.use(helmet())
-// app.set('trust proxy', 1)
+app.set('trust proxy', 1)
 app.use(
   session({
     secret: process.env.ACCESS_SESSION_SECRET,
@@ -66,4 +69,6 @@ app.use((err, req, res, next) => {
 })
 
 const PORT = process.env.PORT || 5000
+console.log(PORT)
+
 httpServer.listen(PORT, () => `Server started on port ${PORT}`)
