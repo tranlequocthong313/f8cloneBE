@@ -19,8 +19,8 @@ const io = new Server(httpServer, {
   cors: {
     origin:
       process.env.NODE_ENV === 'development'
-        ? 'http://localhost:3000/'
-        : 'https://f8clone.tk/',
+        ? 'http://localhost:5000/'
+        : 'https://f8clone.herokuapp.com',
   },
 })
 socketHandlers(io)
