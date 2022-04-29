@@ -15,12 +15,6 @@ const app = express()
 const { createServer } = require('http')
 const { Server } = require('socket.io')
 const httpServer = createServer(app)
-const io = new Server(httpServer, {
-  cors: {
-    origin: '*',
-  },
-})
-socketHandlers(io)
 
 db.connect()
 
@@ -32,10 +26,10 @@ app.use(
     secret: process.env.ACCESS_SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
-    cookie: {
-      secure: process.env.NODE_ENV === 'development' ? false : true,
-      httpOnly: process.env.NODE_ENV === 'development' ? false : true,
-    },
+    // cookie: {
+    //   secure: process.env.NODE_ENV === 'development' ? false : true,
+    //   httpOnly: process.env.NODE_ENV === 'development' ? false : true,
+    // },
   })
 )
 app.use(
@@ -65,7 +59,12 @@ app.use((err, req, res, next) => {
   })
 })
 
-const PORT = process.env.PORT || 5000
-console.log(PORT)
+const io = new Server(httpServer, {
+  cors: {
+    origin: '*',
+  },
+})
+socketHandlers(io)
 
+const PORT = process.env.PORT || 5000
 httpServer.listen(PORT, () => `Server started on port ${PORT}`)
