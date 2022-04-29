@@ -9,29 +9,20 @@ const createError = require('http-errors')
 const helmet = require('helmet')
 const logEvents = require('./src/helper/logEvents')
 const socketHandlers = require('./src/helper/socket')
-const session = require('express-session')
 const app = express()
-
 const { createServer } = require('http')
 const { Server } = require('socket.io')
 const httpServer = createServer(app)
 
 db.connect()
 
-app.use(cors())
-app.use(helmet())
-app.set('trust proxy', 1)
 app.use(
-  session({
-    secret: process.env.ACCESS_SESSION_SECRET,
-    resave: false,
-    saveUninitialized: true,
-    // cookie: {
-    //   secure: process.env.NODE_ENV === 'development' ? false : true,
-    //   httpOnly: process.env.NODE_ENV === 'development' ? false : true,
-    // },
+  cors({
+    origin: '*',
+    credentials: true,
   })
 )
+app.use(helmet())
 app.use(
   compression({
     level: 6,
