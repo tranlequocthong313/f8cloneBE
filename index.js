@@ -18,7 +18,6 @@ const httpServer = createServer(app)
 const io = new Server(httpServer, {
   cors: {
     origin: `*`,
-    methods: ['GET', 'POST'],
   },
 })
 socketHandlers(io)
@@ -27,7 +26,7 @@ db.connect()
 
 app.use(cors())
 app.use(helmet())
-app.set('trust proxy', 1)
+// app.set('trust proxy', 1)
 app.use(
   session({
     secret: process.env.ACCESS_SESSION_SECRET,
