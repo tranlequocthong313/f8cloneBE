@@ -17,10 +17,7 @@ const { Server } = require('socket.io')
 const httpServer = createServer(app)
 const io = new Server(httpServer, {
   cors: {
-    origin:
-      process.env.NODE_ENV === 'development'
-        ? 'http://localhost:5000/'
-        : 'https://f8clone.herokuapp.com',
+    origin: '*',
   },
 })
 socketHandlers(io)
