@@ -6,80 +6,29 @@ const slug = require('mongoose-slug-generator')
 
 mongoose.plugin(slug)
 
-const episodeSchema = new Schema({
-  episodeId: String,
-  title: String,
-  learning: Boolean,
-  lessons: [
-    {
-      lessonId: String,
-      title: String,
-      time: String,
-      learned: { type: Boolean, default: false },
-      videoId: String,
-    },
-  ],
-})
-
-const commentSchema = new Schema({
-  content: String,
-  postedBy: { type: ObjectId, ref: 'users' },
-  createdAt: { type: Date, default: () => Date.now(), immutable: true },
-  isCode: { type: Boolean, default: false },
-  reacts: [
-    {
-      reactedBy: { type: ObjectId, ref: 'users' },
-      emoji: String,
-    },
-  ],
-  replies: [
-    {
-      content: String,
-      postedBy: { type: ObjectId, ref: 'users' },
-      createdAt: { type: Date, default: () => Date.now(), immutable: true },
-      isCode: { type: Boolean, default: false },
-      reacts: [
-        {
-          reactedBy: { type: ObjectId, ref: 'users' },
-          emoji: String,
-        },
-      ],
-    },
-  ],
-})
-
 const CourseSchema = new Schema(
   {
-    title: { type: String, required: true },
-    search: { type: String, required: true },
+    title: { type: String },
+    search: { type: String },
     description: {
       type: String,
-      required: true,
     },
     videoId: {
       type: String,
-      required: true,
     },
     image: String,
-
     level: {
       type: String,
-      required: true,
     },
-    slug: { type: String, slug: 'title', unique: true, slugPaddingSize: 4 },
-    comments: [commentSchema],
-    studentCount: Number,
-    topics: { type: Array, required: true },
+    studentCount: { type: Number, default: 0 },
+    goals: { type: Array },
     requirement: [String],
-    episode: [episodeSchema],
-    role: {
-      Fe: String,
-      Be: String,
-    },
+    role: String,
+    isPopular: { type: Boolean, default: false },
   },
   {
     timestamps: true,
-  },
+  }
 )
 
 CourseSchema.plugin(mongooseDelete, {

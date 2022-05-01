@@ -2,6 +2,8 @@ const express = require('express')
 const router = express.Router()
 const AdminController = require('../app/controllers/AdminController')
 
+router.delete('/course/delete-soft', AdminController.deleteCourseSoft)
+router.patch('/course/add-popular', AdminController.addCoursePopular)
 router.patch('/blog/verify', AdminController.verifyBlog)
 router.delete('/blog/delete-soft', AdminController.deleteBlogSoft)
 router.patch('/blog/add-popular', AdminController.addBlogPopular)

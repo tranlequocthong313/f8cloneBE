@@ -7,6 +7,7 @@ const route = require('./src/routes')
 const compression = require('compression')
 const createError = require('http-errors')
 const helmet = require('helmet')
+const session = require('express-session')
 const logEvents = require('./src/helper/logEvents')
 const socketHandlers = require('./src/helper/socket')
 const app = express()
@@ -16,25 +17,24 @@ const httpServer = createServer(app)
 
 db.connect()
 
-app.use(
-  cors({
-    origin: '*',
-    credentials: true,
-  })
-)
+app.use(cors())
 app.use(helmet())
-app.use(
-  compression({
-    level: 6,
-    threshold: 100 * 1000,
-  })
-)
+app.use(compression())
 app.use(
   express.urlencoded({
     extended: true,
   })
 )
 app.use(express.json())
+app.set('trust proxy', 1)
+app.use(
+  session({
+    secret: process.env.ACCESS_SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: true, httpOnly: true },
+  })
+)
 
 route(app)
 
@@ -43,7 +43,6 @@ app.use((err, req, res, next) => {
   logEvents(`${req.url} -- ${req.method} -- ${err.message}`)
 
   const errStatus = err.status || 500
-
   return res.status(errStatus).json({
     status: errStatus,
     message: err.message,

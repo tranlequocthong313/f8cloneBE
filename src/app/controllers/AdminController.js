@@ -4,6 +4,50 @@ const Video = require('../models/Video')
 const createError = require('http-errors')
 
 class AdminController {
+  // @route PATCH /course/add-popular
+  // @desc Add course to popular course
+  // @access Private
+  async addCoursePopular(req, res, next) {
+    try {
+      const { courseId, isPopular } = req.body
+
+      await Course.updateOne(
+        { _id: courseId },
+        {
+          $set: { isPopular: !isPopular },
+        }
+      )
+
+      const course = await Course.find().sort({ createdAt: -1 })
+      return res.status(200).json(course)
+    } catch (error) {
+      console.error(error.message)
+      return res.status(500).json({
+        success: false,
+        message: 'Add Failed!',
+      })
+    }
+  }
+
+  // @route DELETE /course/delete-soft
+  // @desc Delete soft course
+  // @access Private
+  async deleteCourseSoft(req, res, next) {
+    try {
+      const { courseId } = req.body
+
+      await Course.delete({ _id: { $in: courseId } })
+      const course = await Course.find().sort({ createdAt: -1 })
+      return res.status(200).json(course)
+    } catch (error) {
+      console.error(error.message)
+      return res.status(500).json({
+        success: false,
+        message: 'Delete Failed!',
+      })
+    }
+  }
+
   // @route PATCH /blog/verify
   // @desc Verify blog
   // @access Private
@@ -28,7 +72,7 @@ class AdminController {
   }
 
   // @route DELETE /blog/delete-soft
-  // @desc Delete soft blog by youtube blogId
+  // @desc Delete soft blog
   // @access Private
   async deleteBlogSoft(req, res, next) {
     try {
@@ -36,12 +80,7 @@ class AdminController {
 
       await Blog.delete({ _id: { $in: blogId } })
       const blog = await Blog.find().sort({ createdAt: -1 })
-
-      return res.status(200).json({
-        success: true,
-        message: 'Delete Successfully!',
-        blog,
-      })
+      return res.status(200).json(blog)
     } catch (error) {
       console.error(error.message)
       return res.status(500).json({
@@ -58,18 +97,15 @@ class AdminController {
     try {
       const { blogId, isPopular } = req.body
 
-      const blog = await Blog.findOneAndUpdate(
+      await Blog.updateOne(
         { _id: blogId },
         {
           $set: { isPopular: !isPopular },
         }
-      ).sort({ createdAt: -1 })
+      )
 
-      return res.status(200).json({
-        success: true,
-        message: 'Add Successfully!',
-        blog,
-      })
+      const blog = await Blog.find().sort({ createdAt: -1 })
+      return res.status(200).json(blog)
     } catch (error) {
       console.error(error.message)
       return res.status(500).json({
@@ -80,16 +116,12 @@ class AdminController {
   }
 
   // @route POST /video/create
-  // @desc Create video by youtube videoId
+  // @desc Create video
   // @access Private
   async createVideo(req, res, next) {
     try {
       const video = await Video.create(req.body)
-      return res.status(200).json({
-        success: true,
-        message: 'Create Successfully!',
-        video,
-      })
+      return res.status(200).json(video)
     } catch (error) {
       console.error(error.message)
       return res.status(500).json({
@@ -100,7 +132,7 @@ class AdminController {
   }
 
   // @route DELETE /video/delete-soft
-  // @desc Delete soft video by youtube videoId
+  // @desc Delete soft video
   // @access Private
   async deleteVideoSoft(req, res, next) {
     try {
@@ -109,11 +141,7 @@ class AdminController {
       await Video.delete({ _id: { $in: req.body.videoId } })
       const video = await Video.find().sort({ createdAt: -1 })
 
-      return res.status(200).json({
-        success: true,
-        message: 'Delete Successfully!',
-        video,
-      })
+      return res.status(200).json(video)
     } catch (error) {
       console.error(error.message)
       return res.status(500).json({
@@ -130,18 +158,15 @@ class AdminController {
     try {
       const { videoId, isPopular } = req.body
 
-      const video = await Video.findOneAndUpdate(
+      await Video.updateOne(
         { _id: videoId },
         {
           $set: { isPopular: !isPopular },
         }
-      ).sort({ createdAt: -1 })
+      )
 
-      return res.status(200).json({
-        success: true,
-        message: 'Add Popular Successfully!',
-        video,
-      })
+      const video = await Video.find().sort({ createdAt: -1 })
+      return res.status(200).json(video)
     } catch (error) {
       console.error(error.message)
       return res.status(500).json({

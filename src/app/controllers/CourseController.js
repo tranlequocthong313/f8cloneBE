@@ -2,30 +2,14 @@ const Course = require('../models/Course')
 const createError = require('http-errors')
 
 class CourseController {
-  // @route GET /courses/:slug
-  // @desc Get course by slug
+  // @route GET /courses/:_id
+  // @desc Get course by _id
   // @access Public
-  async getCourse(req, res, next) {
+  async getCourseById(req, res, next) {
     try {
-      const { id } = req.query
-      const { slug } = req.params
+      const { _id } = req.params
 
-      if (id) {
-        const course = await Course.findOne({
-          episode: {
-            $elemMatch: {
-              lessons: {
-                $elemMatch: {
-                  id,
-                },
-              },
-            },
-          },
-        })
-      }
-
-      const course = await Course.findOne({ slug: slug })
-
+      const course = await Course.findById(_id)
       return res.status(200).json(course)
     } catch (error) {
       console.error(error.message)
@@ -36,23 +20,46 @@ class CourseController {
   // @route GET /courses
   // @desc Get all course by role
   // @access Public
-  async getCourseByRole(req, res, next) {
+  async getAllCourse(req, res, next) {
     try {
-      const data = await Promise.all([
-        Course.find({ 'role.FE': 'Front-end' }).select(
-          'id slug image title studentCount'
-        ),
-        Course.find({ 'role.BE': 'Back-end' }).select(
-          'id slug image title studentCount'
-        ),
-      ])
-
-      return res.status(200).json({
-        courseFE: data[0],
-        courseBE: data[1],
-      })
+      const courses = await Course.find({ isPopular: true })
+      return res.status(200).json(courses)
     } catch (error) {
       console.error(error.message)
+      next(createError.InternalServerError())
+    }
+  }
+
+  // @route POST /create
+  // @desc Create new course
+  // @access Private
+  async createCourse(req, res, next) {
+    try {
+      const course = await Course.create(req.body)
+      return res.status(200).json(course)
+    } catch (error) {
+      console.log(error.message)
+      next(createError.InternalServerError())
+    }
+  }
+
+  // @route PUT /edit
+  // @desc Edit course
+  // @access Private
+  async editCourse(req, res, next) {
+    try {
+      const { _id } = req.params
+
+      await Course.updateOne(
+        { _id },
+        {
+          $set: req.body,
+        }
+      )
+      const courses = await Course.find()
+      return res.status(200).json(courses)
+    } catch (error) {
+      console.log(error)
       next(createError.InternalServerError())
     }
   }
