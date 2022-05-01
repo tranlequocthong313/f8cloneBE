@@ -17,20 +17,14 @@ const httpServer = createServer(app)
 
 db.connect()
 
-app.use(cors())
-app.use((req, res, next) => {
-  const allowedOrigins = [
-    'http://localhost:3000',
-    'http://127.0.0.1:3000',
-    'https://f8clone.tk/',
-  ]
-  const origin = req.headers.origin
-  if (allowedOrigins.includes(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin)
-  }
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
-  return next()
-})
+app.use(
+  cors({
+    origin:
+      process.env.NODE_ENV === 'development'
+        ? 'http://127.0.0.1:3000'
+        : 'https://f8clone.tk',
+  })
+)
 app.use(helmet())
 app.use(compression())
 app.use(
@@ -64,7 +58,10 @@ app.use((err, req, res, next) => {
 
 const io = new Server(httpServer, {
   cors: {
-    origin: '*',
+    origin:
+      process.env.NODE_ENV === 'development'
+        ? 'http://127.0.0.1:3000'
+        : 'https://f8clone.tk',
   },
 })
 socketHandlers(io)
