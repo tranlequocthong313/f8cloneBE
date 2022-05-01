@@ -15,7 +15,16 @@ const { createServer } = require('http')
 const { Server } = require('socket.io')
 const httpServer = createServer(app)
 
-db.connect()
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*')
+  res.header('Access-Control-Allow-Headers', '*')
+  next()
+})
+
+const io = new Server(httpServer, {
+  cors: { origin: '*' },
+})
+socketHandlers(io)
 
 app.use(cors())
 app.use(helmet())
@@ -49,10 +58,7 @@ app.use((err, req, res, next) => {
   })
 })
 
-const io = new Server(httpServer, {
-  cors: { origin: '*' },
-})
-socketHandlers(io)
+db.connect()
 
 const PORT = process.env.PORT || 5000
 httpServer.listen(PORT, () => `Server started on port ${PORT}`)
