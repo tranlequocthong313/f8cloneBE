@@ -19,12 +19,17 @@ db.connect()
 
 app.use(cors())
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*')
-  res.header(
-    'Access-Control-Allow-Headers',
-    'Origin, X-Requested-With, Content-Type, Accept'
-  )
-  next()
+  const allowedOrigins = [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'https://f8clone.tk/',
+  ]
+  const origin = req.headers.origin
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin)
+  }
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+  return next()
 })
 app.use(helmet())
 app.use(compression())
