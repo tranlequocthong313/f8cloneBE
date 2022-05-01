@@ -15,25 +15,10 @@ const { createServer } = require('http')
 const { Server } = require('socket.io')
 const httpServer = createServer(app)
 
-const io = new Server(httpServer, {
-  cors: { origin: '*' },
-})
+const io = new Server(httpServer)
 socketHandlers(io)
 
-app.use(
-  cors({
-    origin: '*',
-    credentials: true,
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    allowedHeaders: [
-      'Origin',
-      'Accept',
-      'Content-Type',
-      'Authorization',
-      'X-Request-With',
-    ],
-  })
-)
+app.use(cors())
 app.use(helmet())
 app.use(compression())
 app.use(
