@@ -17,14 +17,7 @@ const httpServer = createServer(app)
 
 db.connect()
 
-app.use(
-  cors({
-    origin:
-      process.env.NODE_ENV === 'development'
-        ? 'http://127.0.0.1:3000'
-        : 'https://f8clone.tk',
-  })
-)
+app.use(cors())
 app.use(helmet())
 app.use(compression())
 app.use(
@@ -57,12 +50,7 @@ app.use((err, req, res, next) => {
 })
 
 const io = new Server(httpServer, {
-  cors: {
-    origin:
-      process.env.NODE_ENV === 'development'
-        ? 'http://127.0.0.1:3000'
-        : 'https://f8clone.tk',
-  },
+  cors: { origin: '*' },
 })
 socketHandlers(io)
 
