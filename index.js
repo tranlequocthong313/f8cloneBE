@@ -52,11 +52,15 @@ db.connect()
 
 const io = new Server(httpServer, {
   cors: {
-    origin: ['*'],
+    origin: '*',
+    methods: ['GET', 'POST'],
+    credentials: true,
 
     handlePreflightRequest: (req, res) => {
       res.writeHead(200, {
-        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Origin': 'https://example.com',
+        'Access-Control-Allow-Methods': 'GET,POST',
+        'Access-Control-Allow-Credentials': true,
       })
       res.end()
     },
