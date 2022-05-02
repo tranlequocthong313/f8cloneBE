@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "SET UV_THREADPOOL_SIZE=8 && node index",
+    "start": "node index",
     "server": "nodemon index"
   },
   "dependencies": {
