@@ -25,7 +25,6 @@ class SiteController {
 
       return res.json({
         courses: data[0],
-
         blogs: data[1],
         videos: data[2],
       })

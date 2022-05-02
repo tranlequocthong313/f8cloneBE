@@ -6,15 +6,16 @@ const jwt = require('jsonwebtoken')
 const MailHtml = require('../../helper/mailHTML')
 const removeAccents = require('vn-remove-accents')
 const createError = require('http-errors')
+const Course = require('../models/Course')
 
 class UserController {
-  // @route GET api/auth
+  // @route GET auth/check-user
   // @desc Check if user is logged in
   // @access Public
   async getUser(req, res, next) {
     try {
       const { _id } = req
-      let user = await User.findById({ _id })
+      const user = await User.findById(_id)
 
       return !user
         ? res.json({ success: false, message: 'User not found' })
@@ -382,15 +383,56 @@ class UserController {
 
       const blogId = await User.findById(_id).select('bookmark')
 
+      // Can't populate blog's author by User
       const bookmark = await Blog.find({
         _id: { $in: blogId.bookmark },
       })
-        .select('_id titleDisplay slug createdAt')
+        .select('_id titleDisplay createdAt')
         .populate('postedBy', '_id fullName')
 
-      return res.json(bookmark)
+      return res.status(200).json(bookmark)
     } catch (error) {
       console.error(error.message)
+      next(createError.InternalServerError())
+    }
+  }
+
+  // @route PUT me/enroll-course/:courseId
+  // @desc Enroll course
+  // @access Private
+  async enrollCourse(req, res, next) {
+    try {
+      const { _id } = req
+      const { courseId } = req.params
+
+      await User.updateOne({ _id }, { $push: { coursesEnrolled: courseId } })
+      await Course.updateOne({ _id: courseId }, { $inc: { studentCount: 1 } })
+      const coursesEnrolled = await User.find({ _id }).select('coursesEnrolled')
+
+      return res.status(200).json({
+        success: true,
+        message: 'Enroll course success',
+        coursesEnrolled,
+      })
+    } catch (error) {
+      console.log(error.message)
+      next(createError.InternalServerError())
+    }
+  }
+
+  // @route GET me/courses
+  // @desc Get enrolled courses
+  // @access Private
+  async getEnrolledCourse(req, res, next) {
+    try {
+      const { _id } = req
+
+      const coursesEnrolled = await User.findById(_id)
+        .populate('coursesEnrolled')
+        .select('coursesEnrolled -_id')
+      return res.status(200).json(coursesEnrolled)
+    } catch (error) {
+      console.log(error.message)
       next(createError.InternalServerError())
     }
   }
