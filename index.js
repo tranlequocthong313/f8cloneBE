@@ -58,6 +58,7 @@ const io = new Server(httpServer, {
       res.writeHead(200, {
         'Access-Control-Allow-Origin': '*',
       })
+      res.end()
     },
   },
 })
