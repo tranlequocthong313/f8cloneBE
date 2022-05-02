@@ -11,11 +11,12 @@ const session = require('express-session')
 const logEvents = require('./src/helper/logEvents')
 const socketHandlers = require('./src/helper/socket')
 const app = express()
-const http = require('http')
-const socketIO = require('socket.io')
-const server = http.createServer(app)
+const { createServer } = require('http')
+const { Server } = require('socket.io')
+const httpServer = createServer(app)
 
 app.use(cors())
+
 app.use(helmet())
 app.use(compression())
 app.use(
@@ -49,16 +50,18 @@ app.use((err, req, res, next) => {
 
 db.connect()
 
-const io = socketIO(server, {
+const io = new Server(httpServer, {
   cors: {
-    origin:
-      process.env.NODE_ENV !== 'production'
-        ? 'http://localhost:3000'
-        : 'https://f8clone.tk:80  ',
-    methods: ['GET', 'POST'],
+    origin: ['*'],
+
+    handlePreflightRequest: (req, res) => {
+      res.writeHead(200, {
+        'Access-Control-Allow-Origin': '*',
+      })
+    },
   },
 })
 socketHandlers(io)
 
 const PORT = process.env.PORT || 5000
-server.listen(PORT, () => `Server started on port ${PORT}`)
+httpServer.listen(PORT, () => `Server started on port ${PORT}`)
