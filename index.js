@@ -17,12 +17,23 @@ const httpServer = createServer(app)
 
 const io = new Server(httpServer, {
   cors: {
-    origin: '*',
+    origin:
+      process.env.NODE_ENV !== 'production'
+        ? 'http://localhost:3000'
+        : process.env.CLIENT_URL,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
   },
 })
 socketHandlers(io)
 
-app.use(cors())
+app.use(
+  cors({
+    origin:
+      process.env.NODE_ENV !== 'production'
+        ? 'http://localhost:3000'
+        : process.env.CLIENT_URL,
+  })
+)
 app.use(helmet())
 app.use(compression())
 app.use(
