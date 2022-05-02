@@ -11,29 +11,11 @@ const session = require('express-session')
 const logEvents = require('./src/helper/logEvents')
 const socketHandlers = require('./src/helper/socket')
 const app = express()
-const { createServer } = require('http')
-const { Server } = require('socket.io')
-const httpServer = createServer(app)
+const http = require('http')
+const socketIO = require('socket.io')
+const server = http.createServer(app)
 
-const io = new Server(httpServer, {
-  cors: {
-    origin:
-      process.env.NODE_ENV !== 'production'
-        ? 'http://localhost:3000'
-        : process.env.CLIENT_URL,
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-  },
-})
-socketHandlers(io)
-
-app.use(
-  cors({
-    origin:
-      process.env.NODE_ENV !== 'production'
-        ? 'http://localhost:3000'
-        : process.env.CLIENT_URL,
-  })
-)
+app.use(cors())
 app.use(helmet())
 app.use(compression())
 app.use(
@@ -67,5 +49,16 @@ app.use((err, req, res, next) => {
 
 db.connect()
 
+const io = socketIO(server, {
+  cors: {
+    origin:
+      process.env.NODE_ENV !== 'production'
+        ? 'http://localhost:3000'
+        : process.env.CLIENT_URL,
+    methods: ['GET', 'POST'],
+  },
+})
+socketHandlers(io)
+
 const PORT = process.env.PORT || 5000
-httpServer.listen(PORT, () => `Server started on port ${PORT}`)
+server.listen(PORT, () => `Server started on port ${PORT}`)
