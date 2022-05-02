@@ -54,7 +54,7 @@ const io = socketIO(server, {
     origin:
       process.env.NODE_ENV !== 'production'
         ? 'http://localhost:3000'
-        : process.env.CLIENT_URL,
+        : 'https://f8clone.tk:80  ',
     methods: ['GET', 'POST'],
   },
 })
