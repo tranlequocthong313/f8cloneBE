@@ -7,7 +7,6 @@ const route = require('./src/routes')
 const compression = require('compression')
 const createError = require('http-errors')
 const helmet = require('helmet')
-const session = require('express-session')
 const logEvents = require('./src/helper/logEvents')
 const socketHandlers = require('./src/helper/socket')
 const app = express()
@@ -16,22 +15,12 @@ const { Server } = require('socket.io')
 const httpServer = createServer(app)
 
 app.use(cors())
-
 app.use(helmet())
 app.use(compression())
+app.use(express.json())
 app.use(
   express.urlencoded({
     extended: true,
-  })
-)
-app.use(express.json())
-app.set('trust proxy', 1)
-app.use(
-  session({
-    secret: process.env.ACCESS_SESSION_SECRET,
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: true, httpOnly: true },
   })
 )
 
