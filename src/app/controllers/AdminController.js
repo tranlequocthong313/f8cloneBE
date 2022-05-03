@@ -2,6 +2,7 @@ const Blog = require('../models/Blog')
 const Course = require('../models/Course')
 const Video = require('../models/Video')
 const createError = require('http-errors')
+const consoleLog = require('../../helper/consoleLog')
 
 class AdminController {
   // @route PATCH /course/add-popular
@@ -21,7 +22,7 @@ class AdminController {
       const course = await Course.find().sort({ createdAt: -1 })
       return res.status(200).json(course)
     } catch (error) {
-      console.error(error.message)
+      consoleLog(error.message)
       return res.status(500).json({
         success: false,
         message: 'Add Failed!',
@@ -40,7 +41,7 @@ class AdminController {
       const course = await Course.find().sort({ createdAt: -1 })
       return res.status(200).json(course)
     } catch (error) {
-      console.error(error.message)
+      consoleLog(error.message)
       return res.status(500).json({
         success: false,
         message: 'Delete Failed!',
@@ -66,7 +67,7 @@ class AdminController {
         message: 'Successfully!',
       })
     } catch (error) {
-      console.error(error.message)
+      consoleLog(error.message)
       next(createError.InternalServerError())
     }
   }
@@ -82,7 +83,7 @@ class AdminController {
       const blog = await Blog.find().sort({ createdAt: -1 })
       return res.status(200).json(blog)
     } catch (error) {
-      console.error(error.message)
+      consoleLog(error.message)
       return res.status(500).json({
         success: false,
         message: 'Delete Failed!',
@@ -107,7 +108,7 @@ class AdminController {
       const blog = await Blog.find().sort({ createdAt: -1 })
       return res.status(200).json(blog)
     } catch (error) {
-      console.error(error.message)
+      consoleLog(error.message)
       return res.status(500).json({
         success: false,
         message: 'Add Failed!',
@@ -123,7 +124,7 @@ class AdminController {
       const video = await Video.create(req.body)
       return res.status(200).json(video)
     } catch (error) {
-      console.error(error.message)
+      consoleLog(error.message)
       return res.status(500).json({
         success: false,
         message: 'Create Failed!',
@@ -143,7 +144,7 @@ class AdminController {
 
       return res.status(200).json(video)
     } catch (error) {
-      console.error(error.message)
+      consoleLog(error.message)
       return res.status(500).json({
         success: false,
         message: 'Delete Failed!',
@@ -168,7 +169,7 @@ class AdminController {
       const video = await Video.find().sort({ createdAt: -1 })
       return res.status(200).json(video)
     } catch (error) {
-      console.error(error.message)
+      consoleLog(error.message)
       return res.status(500).json({
         success: false,
         message: 'Add Popular Failed!',
@@ -193,7 +194,7 @@ class AdminController {
         videos: data[2],
       })
     } catch (error) {
-      console.error(error.message)
+      consoleLog(error.message)
       next(createError.InternalServerError())
     }
   }

@@ -25,15 +25,15 @@ app.use(
   })
 )
 app.use(express.json())
-// app.set('trust proxy', 1)
-// app.use(
-//   session({
-//     secret: process.env.ACCESS_SESSION_SECRET,
-//     resave: false,
-//     saveUninitialized: true,
-//     cookie: { secure: true, httpOnly: true },
-//   })
-// )
+app.set('trust proxy', 1)
+app.use(
+  session({
+    secret: process.env.ACCESS_SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: true, httpOnly: true },
+  })
+)
 
 route(app)
 

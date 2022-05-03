@@ -5,6 +5,7 @@ const Video = require('../models/Video')
 const User = require('../models/User')
 const Contact = require('../models/Contact')
 const createError = require('http-errors')
+const consoleLog = require('../../helper/consoleLog')
 
 class HelpController {
   // @route PATCH /setting/fullName
@@ -25,7 +26,7 @@ class HelpController {
 
       return res.json(fullNameUpdated)
     } catch (error) {
-      console.error(error.message)
+      consoleLog(error.message)
       next(createError.InternalServerError())
     }
   }
@@ -48,7 +49,7 @@ class HelpController {
 
       return res.json(avatar)
     } catch (error) {
-      console.error(error.message)
+      consoleLog(error.message)
       next(createError.InternalServerError())
     }
   }
@@ -71,7 +72,7 @@ class HelpController {
 
       return res.json(bioUpdated)
     } catch (error) {
-      console.error(error.message)
+      consoleLog(error.message)
       next(createError.InternalServerError())
     }
   }
@@ -106,7 +107,7 @@ class HelpController {
 
       return res.json(socials)
     } catch (error) {
-      console.error(error.message)
+      consoleLog(error.message)
       next(createError.InternalServerError())
     }
   }
@@ -125,7 +126,7 @@ class HelpController {
 
       return res.json(myBlog)
     } catch (error) {
-      console.error(error.message)
+      consoleLog(error.message)
       return res.json({
         success: false,
         message: 'Get my blog failed!',
@@ -145,7 +146,7 @@ class HelpController {
 
       return res.json(jobs)
     } catch (error) {
-      console.error(error.message)
+      consoleLog(error.message)
       next(createError.InternalServerError())
     }
   }
@@ -159,7 +160,7 @@ class HelpController {
 
       return res.json(jobs)
     } catch (error) {
-      console.error(error.message)
+      consoleLog(error.message)
       next(createError.InternalServerError())
     }
   }
@@ -237,7 +238,7 @@ class HelpController {
         videos: data[2],
       })
     } catch (error) {
-      console.error(error.message)
+      consoleLog(error.message)
       next(createError.InternalServerError())
     }
   }
@@ -254,7 +255,7 @@ class HelpController {
         contact,
       })
     } catch (error) {
-      console.error(error.message)
+      consoleLog(error.message)
       next(createError.InternalServerError())
     }
   }

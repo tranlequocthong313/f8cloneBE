@@ -2,6 +2,7 @@ const Course = require('../models/Course')
 const Blog = require('../models/Blog')
 const Video = require('../models/Video')
 const createError = require('http-errors')
+const consoleLog = require('../../helper/consoleLog')
 
 class SiteController {
   // @route GET /
@@ -29,7 +30,7 @@ class SiteController {
         videos: data[2],
       })
     } catch (error) {
-      console.error(error.message)
+      consoleLog(error.message)
       next(createError.InternalServerError())
     }
   }

@@ -3,6 +3,7 @@ const User = require('../models/User')
 const handleSchedule = require('node-schedule')
 const createError = require('http-errors')
 const Comment = require('../models/Comment')
+const consoleLog = require('../../helper/consoleLog')
 
 class BlogController {
   // @route POST /new-post
@@ -38,7 +39,7 @@ class BlogController {
         blog,
       })
     } catch (error) {
-      console.error(error.message)
+      consoleLog(error.message)
       return res.status(500).json({
         success: false,
         message: 'Post blog failed!',
@@ -61,7 +62,7 @@ class BlogController {
 
       return res.status(200).json(allBlog)
     } catch (error) {
-      console.error(error.message)
+      consoleLog(error.message)
       return res.status(500).json({
         success: false,
         message: 'Get blog failed!',
@@ -90,7 +91,7 @@ class BlogController {
         blogHighlight: blogData[1],
       })
     } catch (error) {
-      console.error(error.message)
+      consoleLog(error.message)
       next(createError.InternalServerError())
     }
   }
@@ -113,7 +114,7 @@ class BlogController {
 
       return res.status(200).json(blogTagData)
     } catch (error) {
-      console.error(error.message)
+      consoleLog(error.message)
       next(createError.InternalServerError())
     }
   }
@@ -179,7 +180,7 @@ class BlogController {
 
       return res.json(blog)
     } catch (error) {
-      console.log(error.message)
+      consoleLog(error.message)
       next(createError.InternalServerError())
     }
   }
@@ -200,7 +201,7 @@ class BlogController {
 
       return res.status(200).json(blogSameAuthor)
     } catch (error) {
-      console.error(error.message)
+      consoleLog(error.message)
       return res.status(500).json({
         success: false,
         message: 'Get blog failed!',
@@ -226,7 +227,7 @@ class BlogController {
 
       return res.status(200).json(likes)
     } catch (error) {
-      console.error(error.message)
+      consoleLog(error.message)
       next(createError.InternalServerError())
     }
   }
@@ -249,7 +250,7 @@ class BlogController {
 
       return res.status(200).json(likes)
     } catch (error) {
-      console.error(error.message)
+      consoleLog(error.message)
       next(createError.InternalServerError())
     }
   }
@@ -271,7 +272,7 @@ class BlogController {
 
       return res.status(200).json(replyComment)
     } catch (error) {
-      console.error(error.message)
+      consoleLog(error.message)
       next(createError.InternalServerError())
     }
   }
@@ -309,7 +310,7 @@ class BlogController {
 
       return res.status(200).json(comments)
     } catch (error) {
-      console.error(error.message)
+      consoleLog(error.message)
       return res.status(500).json({
         success: false,
         message: 'Reply error',
@@ -345,7 +346,7 @@ class BlogController {
 
       return res.status(200).json(comments)
     } catch (error) {
-      console.error(error.message)
+      consoleLog(error.message)
       return res.status(500).json({
         success: false,
         message: 'React failed!',
@@ -375,7 +376,7 @@ class BlogController {
 
       return res.status(200).json(comments)
     } catch (error) {
-      console.error(error.message)
+      consoleLog(error.message)
       return res.status(500).json({
         success: false,
         message: 'Edit comment failed!',
@@ -400,7 +401,7 @@ class BlogController {
 
       return res.status(200).json(comments)
     } catch (error) {
-      console.error(error.message)
+      consoleLog(error.message)
       return res.status(500).json({
         success: false,
         message: 'Delete comment failed!',

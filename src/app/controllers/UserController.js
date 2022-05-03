@@ -7,6 +7,7 @@ const MailHtml = require('../../helper/mailHTML')
 const removeAccents = require('vn-remove-accents')
 const createError = require('http-errors')
 const Course = require('../models/Course')
+const consoleLog = require('../../helper/consoleLog')
 
 class UserController {
   // @route GET auth/check-user
@@ -21,7 +22,7 @@ class UserController {
         ? res.json({ success: false, message: 'User not found' })
         : res.json({ success: true, message: 'Is Valid token', user })
     } catch (error) {
-      console.error(error.message)
+      consoleLog(error.message)
       next(createError.InternalServerError())
     }
   }
@@ -78,7 +79,7 @@ class UserController {
         user,
       })
     } catch (error) {
-      console.error(error.message)
+      consoleLog(error.message)
       next(createError.InternalServerError())
     }
   }
@@ -120,7 +121,7 @@ class UserController {
         accessToken,
       })
     } catch (error) {
-      console.error(error.message)
+      consoleLog(error.message)
       next(createError.InternalServerError())
     }
   }
@@ -208,7 +209,7 @@ class UserController {
         accessToken,
       })
     } catch (error) {
-      console.error(error.message)
+      consoleLog(error.message)
       return res.json({
         success: false,
         message: 'Login failed!',
@@ -244,7 +245,7 @@ class UserController {
         }),
       })
     } catch (error) {
-      console.error(error.message)
+      consoleLog(error.message)
       next(createError.InternalServerError())
     }
   }
@@ -266,7 +267,7 @@ class UserController {
             used: 'Email đã được sử dụng',
           })
     } catch (error) {
-      console.error(error.message)
+      consoleLog(error.message)
       next(createError.InternalServerError())
     }
   }
@@ -290,7 +291,7 @@ class UserController {
             used: 'Số điện thoại đã được sử dụng',
           })
     } catch (error) {
-      console.error(error.message)
+      consoleLog(error.message)
       next(createError.InternalServerError())
     }
   }
@@ -312,7 +313,7 @@ class UserController {
         message: 'Password has been reset',
       })
     } catch (error) {
-      console.error(error.message)
+      consoleLog(error.message)
       return res.json({
         success: false,
         message: 'Password reset failed',
@@ -353,7 +354,7 @@ class UserController {
 
       return res.json(bookmark)
     } catch (error) {
-      console.error(error.message)
+      consoleLog(error.message)
       next(createError.InternalServerError())
     }
   }
@@ -369,7 +370,7 @@ class UserController {
 
       return res.json(bookmark)
     } catch (error) {
-      console.error(error.message)
+      consoleLog(error.message)
       next(createError.InternalServerError())
     }
   }
@@ -392,7 +393,7 @@ class UserController {
 
       return res.status(200).json(bookmark)
     } catch (error) {
-      console.error(error.message)
+      consoleLog(error.message)
       next(createError.InternalServerError())
     }
   }
@@ -415,7 +416,7 @@ class UserController {
         coursesEnrolled,
       })
     } catch (error) {
-      console.log(error.message)
+      consoleLog(error.message)
       next(createError.InternalServerError())
     }
   }
@@ -432,7 +433,7 @@ class UserController {
         .select('coursesEnrolled -_id')
       return res.status(200).json(coursesEnrolled)
     } catch (error) {
-      console.log(error.message)
+      consoleLog(error.message)
       next(createError.InternalServerError())
     }
   }

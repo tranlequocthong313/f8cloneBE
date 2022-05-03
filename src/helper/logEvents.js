@@ -1,6 +1,7 @@
 const fs = require('fs').promises
 const path = require('path')
 const { format } = require('date-fns')
+const consoleLog = require('../helper/consoleLog')
 
 const fileName = path.join('__dirname', '../logs', 'events.log')
 
@@ -11,7 +12,7 @@ const logEvents = async (message) => {
   try {
     fs.appendFile(fileName, contentLog)
   } catch (error) {
-    console.log(error.message)
+    consoleLog(error.message)
   }
 }
 

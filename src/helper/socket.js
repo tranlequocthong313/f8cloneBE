@@ -22,8 +22,6 @@ const socketHandlers = (io) => {
     socket.on('join', async ({ userId }) => {
       const users = await addUser(userId, socket.id)
 
-      console.log('USER JOINING')
-
       setInterval(() => {
         socket.emit('connectedUsers', {
           users: users.filter((user) => user.id !== userId),
