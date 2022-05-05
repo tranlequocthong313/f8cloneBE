@@ -1,10 +1,9 @@
 const Course = require('../models/Course')
 const createError = require('http-errors')
-const consoleLog = require('../../helper/consoleLog')
 
 class CourseController {
   // @route GET /courses/:_id
-  // @desc Get course by _id
+  // @desc Get course by id
   // @access Public
   async getCourseById(req, res, next) {
     try {
@@ -13,7 +12,23 @@ class CourseController {
       const course = await Course.findById(_id)
       return res.status(200).json(course)
     } catch (error) {
-      consoleLog(error.message)
+      console.log(error.message)
+      next(createError.InternalServerError())
+    }
+  }
+
+  // @route GET /courses/:_id/lessons
+  // @desc Get lessons by course id
+  // @access Private
+  async getLessonsByCourseId(req, res, next) {
+    try {
+      const { _id } = req.params
+
+      const lessons = await Course.findById(_id).populate('episodes.lessons')
+
+      return res.status(200).json(lessons)
+    } catch (error) {
+      console.log(error.message)
       next(createError.InternalServerError())
     }
   }
@@ -26,7 +41,7 @@ class CourseController {
       const courses = await Course.find({ isPopular: true })
       return res.status(200).json(courses)
     } catch (error) {
-      consoleLog(error.message)
+      console.log(error.message)
       next(createError.InternalServerError())
     }
   }
@@ -39,7 +54,7 @@ class CourseController {
       const course = await Course.create(req.body)
       return res.status(200).json(course)
     } catch (error) {
-      consoleLog(error.message)
+      console.log(error.message)
       next(createError.InternalServerError())
     }
   }

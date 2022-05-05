@@ -16,7 +16,7 @@ class CommentController {
 
       return res.status(200).json(comments)
     } catch (error) {
-      consoleLog(error.message)
+      console.log(error.message)
       next(createError.InternalServerError())
     }
   }
@@ -45,7 +45,7 @@ class CommentController {
         comment,
       })
     } catch (error) {
-      consoleLog(error.message)
+      console.log(error.message)
       next(createError.InternalServerError())
     }
   }
@@ -71,7 +71,7 @@ class CommentController {
         comments,
       })
     } catch (error) {
-      consoleLog(error.message)
+      console.log(error.message)
       next(createError.InternalServerError())
     }
   }
@@ -99,7 +99,7 @@ class CommentController {
         comments,
       })
     } catch (error) {
-      consoleLog(error.message)
+      console.log(error.message)
       next(createError.InternalServerError())
     }
   }
@@ -121,7 +121,7 @@ class CommentController {
         comments,
       })
     } catch (error) {
-      consoleLog(error.message)
+      console.log(error.message)
       next(createError.InternalServerError())
     }
   }
@@ -146,7 +146,7 @@ class CommentController {
 
       return res.status(200).json(likes)
     } catch (error) {
-      consoleLog(error.message)
+      console.log(error.message)
       next(createError.InternalServerError())
     }
   }
@@ -171,7 +171,7 @@ class CommentController {
 
       return res.status(200).json(likes)
     } catch (error) {
-      consoleLog(error.message)
+      console.log(error.message)
       next(createError.InternalServerError())
     }
   }

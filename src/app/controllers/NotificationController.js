@@ -3,7 +3,6 @@ const Blog = require('../models/Blog')
 const Video = require('../models/Video')
 const Notification = require('../models/Notification')
 const createError = require('http-errors')
-const consoleLog = require('../../helper/consoleLog')
 
 class NotificationController {
   // @route POST /new-notification
@@ -14,7 +13,7 @@ class NotificationController {
       const notification = await Notification.create(req.body)
       return res.json(notification)
     } catch (error) {
-      consoleLog(error.message)
+      console.log(error.message)
       next(createError.InternalServerError())
     }
   }
@@ -37,7 +36,7 @@ class NotificationController {
 
       return res.json(notification)
     } catch (error) {
-      consoleLog(error.message)
+      console.log(error.message)
       next(createError.InternalServerError())
     }
   }
@@ -55,7 +54,7 @@ class NotificationController {
 
       return res.json(notification)
     } catch (error) {
-      consoleLog(error.message)
+      console.log(error.message)
       next(createError.InternalServerError())
     }
   }

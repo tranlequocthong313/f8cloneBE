@@ -1,5 +1,4 @@
 const Video = require('../models/Video')
-const consoleLog = require('../../helper/consoleLog')
 
 class VideoController {
   // @route POST /video/create
@@ -14,7 +13,7 @@ class VideoController {
         video,
       })
     } catch (error) {
-      consoleLog(error.message)
+      console.log(error.message)
       return res.json({
         success: false,
         message: 'Create Failed!',
@@ -38,7 +37,7 @@ class VideoController {
         video,
       })
     } catch (error) {
-      consoleLog(error.message)
+      console.log(error.message)
       return res.json({
         success: false,
         message: 'Create Failed!',
@@ -66,7 +65,7 @@ class VideoController {
         video,
       })
     } catch (error) {
-      consoleLog(error.message)
+      console.log(error.message)
       return res.json({
         success: false,
         message: 'Create Failed!',
