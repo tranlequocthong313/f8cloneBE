@@ -407,7 +407,9 @@ class UserController {
 
       await User.updateOne({ _id }, { $push: { coursesEnrolled: courseId } })
       await Course.updateOne({ _id: courseId }, { $inc: { studentCount: 1 } })
-      const coursesEnrolled = await User.find({ _id }).select('coursesEnrolled')
+      const coursesEnrolled = await User.find({ _id }).select(
+        'coursesEnrolled -_id'
+      )
 
       return res.status(200).json({
         success: true,

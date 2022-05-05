@@ -23,7 +23,7 @@ const UserSchema = new Schema(
     },
 
     bio: String,
-    coursesEnrolled: [{ type: ObjectId, ref: 'courses', default: [] }],
+    coursesEnrolled: [{ type: ObjectId, ref: 'courses' }],
   },
   {
     timestamps: true,
