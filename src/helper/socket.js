@@ -29,28 +29,48 @@ const socketHandlers = (io) => {
       }, 10000)
     })
 
-    socket.on('post', async ({ description, postId, sender, receiverId }) => {
-      if (sender && receiverId !== sender.userId) {
-        const receiverSocket = findConnectedUser(receiverId)
-        if (receiverSocket) {
-          io.to(receiverSocket.socketId).emit('notificationReceived', {
-            description,
-            postId,
-            senderName: sender.displayName,
-            receiverId,
-            senderId: sender.userId,
-            senderImage: sender.photoURL,
-            createdAt: new Date().toISOString(),
-          })
+    socket.on(
+      'post',
+      async ({ description, postId, sender, receiverId, postType }) => {
+        if (sender && receiverId !== sender.userId) {
+          const receiverSocket = findConnectedUser(receiverId)
+          if (receiverSocket) {
+            io.to(receiverSocket.socketId).emit('notificationReceived', {
+              description,
+              postId,
+              senderName: sender.displayName,
+              receiverId,
+              senderId: sender.userId,
+              senderImage: sender.photoURL,
+              postType,
+              createdAt: new Date().toISOString(),
+            })
+          }
         }
       }
-    })
+    )
 
     socket.on(
       'comment',
-      async ({ description, postId, sender, receiver, commentContent }) => {
+      async ({
+        description,
+        postId,
+        sender,
+        receiver,
+        commentContent,
+        postType,
+      }) => {
         if (sender && receiver.postedBy._id !== sender.userId) {
           const receiverSocket = findConnectedUser(receiver.postedBy._id)
+
+          console.log({
+            description,
+            postId,
+            sender,
+            receiver,
+            commentContent,
+            postType,
+          })
 
           if (receiverSocket) {
             io.to(receiverSocket.socketId).emit('notificationReceived', {
@@ -62,6 +82,7 @@ const socketHandlers = (io) => {
               senderId: sender.userId,
               senderImage: sender.photoURL,
               commentContent,
+              postType,
               createdAt: new Date().toISOString(),
             })
           }
@@ -81,6 +102,7 @@ const socketHandlers = (io) => {
             receiverName: receiver.fullName,
             receiverId: receiver._id,
             senderImage: sender.photoURL,
+            postType,
             createdAt: new Date().toISOString(),
           })
         }

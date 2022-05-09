@@ -9,6 +9,10 @@ const NotificationSchema = new Schema({
     type: String,
     enum: ['like', 'comment', 'post'],
   },
+  postType: {
+    type: String,
+    enum: ['blogs', 'lessons'],
+  },
   senderImage: String,
   senderName: String,
   receiverName: String,

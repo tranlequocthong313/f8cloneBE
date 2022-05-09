@@ -9,7 +9,7 @@ const CommentSchema = new Schema(
       type: ObjectId,
       refPath: 'commentType',
     },
-    commentType: { type: String, enum: ['blogs', 'courses'] },
+    commentType: { type: String, enum: ['blogs', 'lessons'] },
     postedBy: { type: ObjectId, ref: 'users' },
     likes: [{ type: ObjectId, ref: 'users' }],
     isCode: { type: Boolean, default: false },

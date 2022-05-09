@@ -24,6 +24,7 @@ const UserSchema = new Schema(
 
     bio: String,
     coursesEnrolled: [{ type: ObjectId, ref: 'courses' }],
+    lessonLearned: [{ type: ObjectId, ref: 'lessons' }],
   },
   {
     timestamps: true,

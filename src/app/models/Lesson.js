@@ -5,11 +5,14 @@ const Schema = mongoose.Schema
 const LessonSchema = new Schema(
   {
     title: String,
-    description: String,
     videoId: String,
     duration: String,
     comments: [{ type: ObjectId, ref: 'comments' }],
-    episodeParent: { type: ObjectId, ref: 'episodes' },
+    episodeParent: String,
+    postedBy: {
+      type: ObjectId,
+      ref: 'users',
+    },
   },
   {
     timestamps: true,

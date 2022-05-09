@@ -142,12 +142,13 @@ class BlogController {
       const { _id } = req.params
       const { title, content } = req.body
 
-      await Blog.updateOne(
+      const blog = await Blog.findOneAndUpdate(
         { _id },
         {
           $set: {
             title,
             content,
+            isVerified: false,
           },
         }
       )
@@ -155,6 +156,7 @@ class BlogController {
       return res.status(200).json({
         success: true,
         message: 'Edit blog successfully!',
+        blog,
       })
     } catch (error) {
       console.log(error)

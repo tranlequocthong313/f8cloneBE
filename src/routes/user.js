@@ -5,6 +5,11 @@ const verifyToken = require('../middleware/verifyToken')
 
 router.get('/courses', verifyToken, userController.getEnrolledCourse)
 router.put('/enroll-course/:courseId', verifyToken, userController.enrollCourse)
+router.patch(
+  '/lesson-learned/:lessonId',
+  verifyToken,
+  userController.addLessonLearned
+)
 router.patch('/bookmark', verifyToken, userController.bookmark)
 router.get('/bookmark', verifyToken, userController.getBookmark)
 router.get(

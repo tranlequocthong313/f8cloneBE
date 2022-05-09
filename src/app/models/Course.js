@@ -26,7 +26,11 @@ const CourseSchema = new Schema(
     role: String,
     isPopular: { type: Boolean, default: false },
     episodes: [
-      { title: String, lessons: [{ type: ObjectId, ref: 'lessons' }] },
+      {
+        _id: String,
+        title: String,
+        lessons: [{ type: ObjectId, ref: 'lessons' }],
+      },
     ],
   },
   {

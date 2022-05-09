@@ -438,6 +438,31 @@ class UserController {
       next(createError.InternalServerError())
     }
   }
+
+  // @route PATCH me/lesson-learned/:lessonId
+  // @desc Add lesson learned
+  // @access Private
+  async addLessonLearned(req, res, next) {
+    try {
+      const { _id } = req
+      const { lessonId } = req.params
+
+      const lessonLearned = await User.findOneAndUpdate(
+        { _id },
+        {
+          $push: { lessonLearned: lessonId },
+        },
+        { new: true }
+      ).select('lessonLearned -_id')
+
+      console.log(lessonLearned)
+
+      return res.status(200).json(lessonLearned)
+    } catch (error) {
+      console.log(error.message)
+      next(createError.InternalServerError())
+    }
+  }
 }
 
 module.exports = new UserController()

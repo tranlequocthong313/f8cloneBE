@@ -1,6 +1,7 @@
 const Comment = require('../models/Comment')
 const createError = require('http-errors')
 const Blog = require('../models/Blog')
+const Lesson = require('../models/Lesson')
 
 class CommentController {
   // @route GET /:postId
@@ -26,15 +27,24 @@ class CommentController {
   // @access Private
   async createComment(req, res, next) {
     try {
-      const { post } = req.body
+      const { post, commentType } = req.body
 
       const newComment = await Comment.create(req.body)
-      await Blog.updateOne(
-        { _id: post },
-        {
-          $push: { comments: [newComment._id] },
-        }
-      )
+      if (commentType === 'blogs') {
+        await Blog.updateOne(
+          { _id: post },
+          {
+            $push: { comments: [newComment._id] },
+          }
+        )
+      } else {
+        await Lesson.updateOne(
+          { _id: post },
+          {
+            $push: { comments: [newComment._id] },
+          }
+        )
+      }
       const comment = await Comment.find({ post })
         .populate('postedBy')
         .sort({ createdAt: -1 })
@@ -43,32 +53,6 @@ class CommentController {
         success: true,
         message: 'Create comment success',
         comment,
-      })
-    } catch (error) {
-      console.log(error.message)
-      next(createError.InternalServerError())
-    }
-  }
-
-  // @route POST /reply
-  // @desc Create new reply comment
-  // @access Private
-  async createReplyComment(req, res, next) {
-    try {
-      const { post } = req.body
-
-      console.log(req.body)
-
-      await Comment.create(req.body)
-
-      const comments = await Comment.find({ post })
-        .populate('postedBy')
-        .sort({ createdAt: -1 })
-
-      return res.status(200).json({
-        success: true,
-        message: 'Create reply comment success',
-        comments,
       })
     } catch (error) {
       console.log(error.message)
@@ -132,19 +116,20 @@ class CommentController {
   async likeComment(req, res, next) {
     try {
       const { _id } = req
-      const { commentId } = req.params
+      const { commentId, postId } = req.params
 
-      const likes = await Comment.findByIdAndUpdate(
-        commentId,
+      await Comment.updateOne(
+        { _id: commentId },
         {
           $push: { likes: _id },
-        },
-        { new: true }
-      ).select('likes')
+        }
+      )
 
-      console.log('LIKED: ', likes)
+      const comments = await Comment.find({ post: postId })
+        .populate('postedBy')
+        .sort({ createdAt: -1 })
 
-      return res.status(200).json(likes)
+      return res.status(200).json(comments)
     } catch (error) {
       console.log(error.message)
       next(createError.InternalServerError())
@@ -157,19 +142,20 @@ class CommentController {
   async unlikeComment(req, res, next) {
     try {
       const { _id } = req
-      const { commentId } = req.params
+      const { commentId, postId } = req.params
 
-      const likes = await Comment.findByIdAndUpdate(
-        commentId,
+      await Comment.updateOne(
+        { _id: commentId },
         {
           $pull: { likes: _id },
-        },
-        { new: true }
-      ).select('likes')
+        }
+      )
 
-      console.log('UNLIKED: ', likes)
+      const comments = await Comment.find({ post: postId })
+        .populate('postedBy')
+        .sort({ createdAt: -1 })
 
-      return res.status(200).json(likes)
+      return res.status(200).json(comments)
     } catch (error) {
       console.log(error.message)
       next(createError.InternalServerError())
