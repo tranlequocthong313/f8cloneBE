@@ -122,6 +122,7 @@ class CourseController {
       )
         .select('episodes -_id')
         .populate('episodes.lessons')
+
       return res.status(200).json(episodes)
     } catch (error) {
       console.log(error.message)

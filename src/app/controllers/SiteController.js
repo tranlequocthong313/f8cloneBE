@@ -17,7 +17,9 @@ class SiteController {
           schedule: null,
           isPopular: true,
           isVerified: true,
-        }).populate('postedBy'),
+        })
+          .populate('postedBy')
+          .sort({ createdAt: -1 }),
         Video.find({
           isPopular: true,
         }).sort({ createdAt: -1 }),
