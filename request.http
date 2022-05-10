@@ -1,2 +1,4 @@
-GET  https://f8clone.herokuapp.com/
+PATCH  http://localhost:5000/courses/delete-lesson/627948610a33e1909d7d031b/35b20d83-b204-47bf-8ae4-ac251bed5a25/6279e04d6eaefc184d151a74
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjVhYzU1YzdkNTRmNTJmNGFhMmFlY2QiLCJpYXQiOjE2NTE3NTgwMzJ9.j9gpmvO2AW0Ka_SJp0hwIBdAlChO7MX71mnlBkau8eA
 

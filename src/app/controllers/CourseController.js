@@ -1,7 +1,6 @@
 const Course = require('../models/Course')
 const createError = require('http-errors')
 const { v4: uuidv4 } = require('uuid')
-const { create } = require('../models/Course')
 
 class CourseController {
   // @route GET /courses/:_id
@@ -136,7 +135,6 @@ class CourseController {
   async deleteEpisode(req, res, next) {
     try {
       const { courseId, episodeId } = req.params
-      const { title } = req.body
 
       const episodes = await Course.findOneAndUpdate(
         { _id: courseId },
