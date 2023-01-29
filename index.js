@@ -1,40 +1,36 @@
-require('dotenv').config()
+const express = require('express');
+const cors = require('cors');
+const { connectToDb } = require('./src/config/db/index');
+const route = require('./src/routes');
+const compression = require('compression');
+const helmet = require('helmet');
+const socketHandlers = require('./src/helper/socket');
+const app = express();
+const { createServer } = require('http');
+const { Server } = require('socket.io');
+const httpServer = createServer(app);
+const morgan = require('morgan');
+const { notFound, errorHandler } = require('./src/middleware/errorMiddleware');
+require('dotenv').config();
 
-const express = require('express')
-const cors = require('cors')
-const db = require('./src/config/db/index')
-const route = require('./src/routes')
-const compression = require('compression')
-const createError = require('http-errors')
-const helmet = require('helmet')
-const socketHandlers = require('./src/helper/socket')
-const app = express()
-const { createServer } = require('http')
-const { Server } = require('socket.io')
-const httpServer = createServer(app)
+connectToDb();
 
-app.use(cors())
-app.use(helmet())
-app.use(compression())
-app.use(express.json())
-app.use(
-  express.urlencoded({
-    extended: true,
-  })
-)
+const PORT = process.env.PORT || 5000;
+const acceptedOrigins = ['localhost', '127.0.0.1'];
+const morganFormat = 'dev';
+const urlencodedConfig = { extended: true };
 
-route(app)
+app.use(cors(acceptedOrigins))
+  .use(helmet())
+  .use(morgan(morganFormat))
+  .use(compression())
+  .use(express.json())
+  .use(express.urlencoded(urlencodedConfig));
 
-app.use((req, res, next) => next(createError.NotFound('Not Found')))
-app.use((err, req, res, next) => {
-  const errStatus = err.status || 500
-  return res.status(errStatus).json({
-    status: errStatus,
-    message: err.message,
-  })
-})
+app.use(route);
 
-db.connect()
+app.use(notFound);
+app.use(errorHandler);
 
 const io = new Server(httpServer, {
   cors: {
@@ -43,12 +39,11 @@ const io = new Server(httpServer, {
     handlePreflightRequest: (req, res) => {
       res.writeHead(200, {
         'Access-Control-Allow-Origin': '*',
-      })
-      res.end()
+      });
+      res.end();
     },
   },
-})
-socketHandlers(io)
+});
+socketHandlers(io);
 
-const PORT = process.env.PORT || 5000
-httpServer.listen(PORT, () => `Server started on port ${PORT}`)
+httpServer.listen(PORT, () => `Server started on port ${PORT}`);
