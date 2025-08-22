@@ -1,11 +1,7 @@
-require('dotenv').config();
-
-const mongoose = require("mongoose");
 const User = require("../app/models/User"); // path to your UserSchema file
 
 async function seed() {
-  await mongoose.connect(process.env.MONGO_URI);
-
+  try {
   const res = await User.insertMany([
     {
       fullName: "John Doe",
@@ -52,9 +48,10 @@ async function seed() {
   ]);
 
   console.log('user seed res', res)
-
   console.log("✅ Users inserted!");
-  mongoose.disconnect();
+  } catch (error) {
+     console.log("Users not inserted!"); 
+  }
 }
 
-seed();
+module.exports = seed;

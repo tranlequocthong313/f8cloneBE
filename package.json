@@ -5,8 +5,7 @@
   "license": "MIT",
   "scripts": {
     "start": "node index",
-    "server": "nodemon index",
-    "seed": "node run-seeds.js"
+    "server": "nodemon index"
   },
   "dependencies": {
     "bcrypt": "^5.0.1",
