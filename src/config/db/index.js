@@ -6,10 +6,10 @@ const connect = async () => {
     await mongoose.connect(process.env.MONGO_URI);
     console.log('Mongoose connected');
 
-    seedUser()
-    seedJob()
-    seedVideo()
-    seedCourse()
+    // seedUser()
+    // seedJob()
+    // seedVideo()
+    // seedCourse()
   } catch (error) {
     console.log(error.message);
     process.exit(1);
