@@ -1,4 +1,5 @@
 const Course = require('../models/Course');
+const User = require('../models/User')
 
 class CourseController {
     // @route GET /courses/:slug
@@ -60,6 +61,55 @@ class CourseController {
                 success: false,
                 message: 'Internal error!',
             };
+        }
+    }
+
+    // @route PUT /courses/:id/enroll/
+    // @desc Enroll course
+    // @access Private
+    async enrollCourse(req, res) {
+        try {
+            const userId = req._id; 
+            const courseId = req.params.id; 
+
+            const user = await User.findById(userId);
+            if (!user) {
+                return res
+                    .status(404)
+                    .json({ success: false, message: 'User not found' });
+            }
+
+            const course = await Course.findById(courseId);
+            if (!course) {
+                return res
+                    .status(404)
+                    .json({ success: false, message: 'Course not found' });
+            }
+
+            if (user.coursesEnrolled.includes(courseId)) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'You have already enrolled this course',
+                });
+            }
+
+            user.coursesEnrolled.push(courseId);
+            await user.save();
+
+            course.studentCount += 1;
+            await course.save();
+
+            return res.json({
+                success: true,
+                message: 'Enroll successfully!',
+                course,
+            });
+        } catch (error) {
+            console.log(error.message);
+            return res.json({
+                success: false,
+                message: 'Enroll failed!',
+            });
         }
     }
 }
