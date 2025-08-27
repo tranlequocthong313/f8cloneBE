@@ -1,5 +1,5 @@
 const Course = require('../models/Course');
-const User = require('../models/User')
+const User = require('../models/User');
 
 class CourseController {
     // @route GET /courses/:slug
@@ -43,10 +43,10 @@ class CourseController {
     async getCourseByRole(req, res) {
         try {
             const data = await Promise.all([
-                Course.find({ 'role.FE': 'Front-end' }).select(
+                Course.find({ role: { $in: ['FE', 'Fullstack'] } }).select(
                     'id slug image title studentCount'
                 ),
-                Course.find({ 'role.BE': 'Back-end' }).select(
+                Course.find({ role: { $in: ['FE', 'Fullstack'] } }).select(
                     'id slug image title studentCount'
                 ),
             ]);
@@ -69,8 +69,8 @@ class CourseController {
     // @access Private
     async enrollCourse(req, res) {
         try {
-            const userId = req._id; 
-            const courseId = req.params.id; 
+            const userId = req._id;
+            const courseId = req.params.id;
 
             const user = await User.findById(userId);
             if (!user) {
