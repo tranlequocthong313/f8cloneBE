@@ -3,6 +3,7 @@ const router = express.Router()
 const BlogController = require('../app/controllers/BlogController')
 const verifyToken = require('../middleware/verifyToken')
 
+router.get('/draft', verifyToken, BlogController.getDraftBlog)
 router.get('/:slug', BlogController.getBlog)
 router.get('/tag/:tag', BlogController.getBlogTag)
 router.get('/edit-blog/:slug', BlogController.getBlog)
