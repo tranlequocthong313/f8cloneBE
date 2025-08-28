@@ -1,23 +1,24 @@
 const express = require('express')
 const router = express.Router()
-const userController = require('../app/controllers/UserController')
+const UserController = require('../app/controllers/UserController')
 const verifyToken = require('../middleware/verifyToken')
 
-router.put('/bookmark', verifyToken, userController.bookmark)
-router.get('/bookmark', verifyToken, userController.getBookmark)
+router.get('/enrolled-courses', verifyToken, UserController.getUserEnrolledCourse)
+router.put('/bookmark', verifyToken, UserController.bookmark)
+router.get('/bookmark', verifyToken, UserController.getBookmark)
 router.get(
   '/bookmark-post',
   verifyToken,
-  userController.getBookmarkAndBlogAuthor,
+  UserController.getBookmarkAndBlogAuthor,
 )
-router.post('/check-email', userController.checkEmail)
-router.post('/phone-number', userController.checkPhoneNumberExist)
-router.post('/provider', userController.loginWithProvider)
-router.post('/email-password', userController.login)
-router.post('/reset-password', userController.resetPassword)
-router.post('/verify', userController.verify)
-router.get('/auth', verifyToken, userController.getUser)
-router.get('/:slug', userController.getUserBySlug)
-router.post('/', userController.register)
+router.post('/check-email', UserController.checkEmail)
+router.post('/phone-number', UserController.checkPhoneNumberExist)
+router.post('/provider', UserController.loginWithProvider)
+router.post('/email-password', UserController.login)
+router.post('/reset-password', UserController.resetPassword)
+router.post('/verify', UserController.verify)
+router.get('/auth', verifyToken, UserController.getUser)
+router.get('/:slug', UserController.getUserBySlug)
+router.post('/', UserController.register)
 
 module.exports = router

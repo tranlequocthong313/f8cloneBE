@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const MailHtml = require('../../utils/MailHTML');
 const removeAccents = require('vn-remove-accents');
+const Course = require('../models/Course');
 
 class UserController {
     // @route GET api/auth
@@ -427,6 +428,9 @@ class UserController {
 
             const user = await User.findOne({
                 slug: req.params.slug,
+            }).populate({
+                path: 'coursesEnrolled',
+                select: '-episode -requirement -topics -comments',
             });
 
             console.log('USER BY SLUG: ', user);
@@ -434,6 +438,40 @@ class UserController {
             res.json(user);
         } catch (error) {
             console.log(error);
+        }
+    }
+
+    // @route GET /me/enrolled-courses
+    // @desc Get user's enrolled courses
+    // @access Private
+    async getUserEnrolledCourse(req, res) {
+        try {
+            const user = await User.findById(req._id);
+            if (!user) {
+                return res.status(404).json({
+                    message: 'User not found',
+                    success: false,
+                });
+            }
+
+            const courses = await Course.find({
+                _id: { $in: user.coursesEnrolled },
+            }).select('-episode -requirement -topics -comments');
+
+            return res.json({
+                message: 'Get enrolled courses successfully!',
+                success: true,
+                courses,
+            });
+        } catch (error) {
+            console.log(
+                '🚀 ~ UserController ~ getUserEnrolledCourse ~ error:',
+                error
+            );
+            return res.status(500).json({
+                message: 'Internal server error',
+                success: false,
+            });
         }
     }
 }
