@@ -6,51 +6,66 @@ const slug = require('mongoose-slug-generator');
 
 mongoose.plugin(slug);
 
-const episodeSchema = new Schema({
-    episodeId: String,
-    title: String,
-    learning: Boolean,
-    lessons: [
-        {
-            lessonId: String,
-            title: String,
-            time: String,
-            learned: { type: Boolean, default: true },
-            videoId: String,
-        },
-    ],
-});
+const lessonSchema = new Schema(
+    {
+        lessonId: String,
+        title: String,
+        time: String,
+        learned: { type: Boolean, default: true },
+        videoId: String,
+    },
+    {
+        timestamps: true,
+    }
+);
 
-const commentSchema = new Schema({
-    content: String,
-    postedBy: { type: ObjectId, ref: 'users' },
-    createdAt: { type: Date, default: () => Date.now(), immutable: true },
-    isCode: { type: Boolean, default: false },
-    reacts: [
-        {
-            reactedBy: { type: ObjectId, ref: 'users' },
-            emoji: String,
-        },
-    ],
-    replies: [
-        {
-            content: String,
-            postedBy: { type: ObjectId, ref: 'users' },
-            createdAt: {
-                type: Date,
-                default: () => Date.now(),
-                immutable: true,
+const episodeSchema = new Schema(
+    {
+        episodeId: String,
+        title: String,
+        learning: Boolean,
+        lessons: [lessonSchema],
+    },
+    {
+        timestamps: true,
+    }
+);
+
+const commentSchema = new Schema(
+    {
+        content: String,
+        postedBy: { type: ObjectId, ref: 'users' },
+        createdAt: { type: Date, default: () => Date.now(), immutable: true },
+        isCode: { type: Boolean, default: false },
+        reacts: [
+            {
+                reactedBy: { type: ObjectId, ref: 'users' },
+                emoji: String,
             },
-            isCode: { type: Boolean, default: false },
-            reacts: [
-                {
-                    reactedBy: { type: ObjectId, ref: 'users' },
-                    emoji: String,
+        ],
+        replies: [
+            {
+                content: String,
+                postedBy: { type: ObjectId, ref: 'users' },
+                createdAt: {
+                    type: Date,
+                    default: () => Date.now(),
+                    immutable: true,
                 },
-            ],
-        },
-    ],
-});
+                isCode: { type: Boolean, default: false },
+                reacts: [
+                    {
+                        reactedBy: { type: ObjectId, ref: 'users' },
+                        emoji: String,
+                    },
+                ],
+            },
+        ],
+    },
+    {
+        timestamps: true,
+    }
+);
 
 const CourseSchema = new Schema(
     {
@@ -65,9 +80,10 @@ const CourseSchema = new Schema(
             required: true,
         },
         image: String,
-
         level: {
             type: String,
+            enum: ['beginner', 'intermediate', 'advance'],
+            default: 'beginner',
             required: true,
         },
         slug: { type: String, slug: 'title', unique: true, slugPaddingSize: 4 },
