@@ -11,7 +11,6 @@ const lessonSchema = new Schema(
         lessonId: String,
         title: String,
         time: String,
-        learned: { type: Boolean, default: true },
         videoId: String,
     },
     {
@@ -23,7 +22,6 @@ const episodeSchema = new Schema(
     {
         episodeId: String,
         title: String,
-        learning: Boolean,
         lessons: [lessonSchema],
     },
     {

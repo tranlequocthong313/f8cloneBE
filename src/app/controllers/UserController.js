@@ -455,7 +455,7 @@ class UserController {
             }
 
             const courses = await Course.find({
-                _id: { $in: user.coursesEnrolled },
+                _id: { $in: user?.coursesEnrolled },
             }).select('-episode -requirement -topics -comments');
 
             return res.json({

@@ -1,4 +1,5 @@
 const Course = require('../models/Course');
+const LearnProgress = require('../models/LearnProgress');
 const User = require('../models/User');
 
 class CourseController {
@@ -99,6 +100,21 @@ class CourseController {
             course.studentCount += 1;
             await course.save();
 
+            const lessons = course.episode.flatMap((ep) => ep.lessons);
+            const lessonProgress = lessons.map((lesson, index) => ({
+                lessonId: lesson._id,
+                status: index === 0 ? 'in-progress' : 'locked',
+                startedAt: index === 0 ? new Date() : null,
+            }));
+
+            const learnProgress = new LearnProgress({
+                userId: user._id,
+                courseId: course._id,
+                lessons: lessonProgress,
+            });
+
+            await learnProgress.save();
+
             return res.json({
                 success: true,
                 message: 'Enroll successfully!',
@@ -109,6 +125,97 @@ class CourseController {
             return res.json({
                 success: false,
                 message: 'Enroll failed!',
+            });
+        }
+    }
+
+    // @route GET /courses/:id/progress/
+    // @desc Get learning progress
+    // @access Private
+    async getLearningProgress(req, res) {
+        try {
+            const progress = await LearnProgress.findOne({
+                courseId: req.params.id,
+                userId: req._id,
+            });
+
+            return res.json({
+                progress,
+                success: true,
+                message: 'Get progress successfully!',
+            });
+        } catch (error) {
+            console.log(
+                '🚀 ~ CourseController ~ getLearningProgress ~ error:',
+                error
+            );
+            return res.status(500).json({
+                message: 'Internal server error',
+                success: false,
+            });
+        }
+    }
+
+    // @route PUT /courses/:id/progress/
+    // @desc Update learning progress
+    // @access Private
+    async updateLearningProgress(req, res) {
+        try {
+            const { lessonId } = req.body;
+            console.log(
+                '🚀 ~ CourseController ~ updateLearningProgress ~ lessonId:',
+                lessonId
+            );
+
+            const progress = await LearnProgress.findOne({
+                courseId: req.params.id,
+                userId: req._id,
+            });
+
+            if (!progress) {
+                return res.status(404).json({
+                    message: 'Progress not found',
+                    success: false,
+                });
+            }
+
+            const index = progress.lessons.findIndex(
+                (lesson) => lesson.lessonId.toString() === lessonId
+            );
+
+            if (index === -1) {
+                return res.status(404).json({
+                    message: 'Lesson not found in progress',
+                    success: false,
+                });
+            }
+
+            progress.lessons[index].completedAt = new Date();
+            progress.lessons[index].status = 'completed';
+
+            if (
+                index + 1 < progress.lessons.length &&
+                progress.lessons[index + 1].status === 'locked'
+            ) {
+                progress.lessons[index + 1].startedAt = new Date();
+                progress.lessons[index + 1].status = 'in-progress';
+            }
+
+            await progress.save();
+
+            return res.json({
+                progress,
+                success: true,
+                message: 'Get progress successfully!',
+            });
+        } catch (error) {
+            console.log(
+                '🚀 ~ CourseController ~ getLearningProgress ~ error:',
+                error
+            );
+            return res.status(500).json({
+                message: 'Internal server error',
+                success: false,
             });
         }
     }
