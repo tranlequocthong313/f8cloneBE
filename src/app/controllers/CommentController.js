@@ -192,6 +192,10 @@ class CommentController {
     // @access Private
     async deleteComment(req, res) {
         try {
+            const comment = await Comment.findOne({
+                _id: req.params.id,
+                postedBy: req._id,
+            });
             const result = await Comment.deleteOne({
                 _id: req.params.id,
                 postedBy: req._id,
@@ -204,7 +208,10 @@ class CommentController {
                 });
             }
 
-            req.io.emit('delete-comment', req.params.id);
+            req.io.emit('delete-comment', {
+                commentId: req.params.id,
+                parentCommentId: comment.parentComment,
+            });
 
             return res.status(204).json({
                 success: true,
