@@ -6,15 +6,13 @@ const db = require('./src/config/db/index');
 const route = require('./src/routes');
 const compression = require('compression');
 const createError = require('http-errors');
+const initSocket = require('./src/config/socket');
 const app = express();
 const http = require('http').createServer(app);
-const io = require('socket.io')(http, {
-    cors: {
-        origin: '*',
-    },
-});
 
 const PORT = process.env.PORT || 5000;
+
+const io = initSocket(http);
 
 app.use(
     compression({
@@ -33,6 +31,11 @@ app.use(
 
 app.use(express.json());
 
+app.use((req, res, next) => {
+    req.io = io;
+    next();
+});
+
 route(app);
 
 app.use((req, res, next) => {
@@ -48,13 +51,4 @@ app.use((err, req, res, next) => {
 
 db.connect();
 
-io.on('connection', (socket) => {
-    socket.on('comment', (comment) => {
-        io.emit('comment', comment);
-    });
-    socket.on('react', (comment) => {
-        io.emit('react', comment);
-    });
-});
-
-http.listen(PORT, () => `Server started on port ${PORT}`);
+http.listen(PORT, '0.0.0.0', () => `Server started on port ${PORT}`);

@@ -6,33 +6,6 @@ const mongooseDelete = require('mongoose-delete')
 
 mongoose.plugin(slug)
 
-const commentSchema = {
-  content: String,
-  postedBy: { type: ObjectId, ref: 'users' },
-  createdAt: { type: Date, default: () => Date.now(), immutable: true },
-  isCode: { type: Boolean, default: false },
-  reacts: [
-    {
-      reactedBy: { type: ObjectId, ref: 'users' },
-      emoji: String,
-    },
-  ],
-  replies: [
-    {
-      content: String,
-      postedBy: { type: ObjectId, ref: 'users' },
-      createdAt: { type: Date, default: () => Date.now(), immutable: true },
-      isCode: { type: Boolean, default: false },
-      reacts: [
-        {
-          reactedBy: { type: ObjectId, ref: 'users' },
-          emoji: String,
-        },
-      ],
-    },
-  ],
-}
-
 const BlogSchema = new Schema(
   {
     title: { type: String },
@@ -42,19 +15,27 @@ const BlogSchema = new Schema(
     image: String,
     titleDisplay: String,
     description: String,
-    tags: [{ type: String, max: 5 }],
+    tags: {
+      type: [String],
+      validate: {
+        validator: function (v) {
+          return !v || v?.length <= 5;
+        },
+      },
+    },
+    likes: [{ type: ObjectId, ref: 'users' }],
     slug: {
       type: String,
       slug: 'title',
       slugPaddingSize: 4,
       unique: true,
+      index: true
     },
-    likes: [{ type: ObjectId, ref: 'users' }],
-    comments: [commentSchema],
     schedule: String,
     postedBy: {
       type: ObjectId,
       ref: 'users',
+      required: true
     },
     allowRecommend: Boolean,
     isPopular: Boolean,
@@ -70,5 +51,8 @@ BlogSchema.plugin(mongooseDelete, {
   overrideMethods: ['find', 'findOne'],
   deletedAt: true,
 })
+
+BlogSchema.index({ tags: 1 });
+BlogSchema.index({ postedBy: 1 });
 
 module.exports = mongoose.model('blogs', BlogSchema)
