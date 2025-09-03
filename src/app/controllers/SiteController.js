@@ -35,10 +35,10 @@ class SiteController {
             });
         } catch (error) {
             console.log(error.message);
-            return {
+            return res.status(500).json({
                 success: false,
-                message: 'Internal error!',
-            };
+                message: 'Internal server error',
+            });
         }
     }
 }
