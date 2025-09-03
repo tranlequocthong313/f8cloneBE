@@ -131,14 +131,7 @@ class CommentController {
             });
 
             await comment.save();
-            await comment.populate([
-                {
-                    path: 'entity',
-                },
-                {
-                    path: 'postedBy',
-                },
-            ]);
+            await comment.populate(['entity', , 'postedBy', 'parentComment']);
 
             req.io.emit('post-comment', comment);
             req.io.emit(
@@ -146,7 +139,10 @@ class CommentController {
                 comment.entity._id
             );
 
-            if (req._id !== comment.entity.postedBy.toString()) {
+            if (
+                req._id !== comment.entity.postedBy.toString() &&
+                !comment.parentComment
+            ) {
                 const notification = new Notification({
                     sender: req._id,
                     receiver: comment.entity.postedBy,
@@ -157,6 +153,29 @@ class CommentController {
 
                 await notification.save();
                 await notification.populate(['sender', 'subject']);
+
+                req.io.emit('notification', notification);
+            } else if (req._id !== comment.parentComment.postedBy.toString()) {
+                const notification = new Notification({
+                    sender: req._id,
+                    receiver: comment.parentComment.postedBy,
+                    type: NotificationTypes.REPLY_COMMENT_BLOG,
+                    subject: comment.parentComment._id,
+                    subjectModel: 'comments',
+                });
+
+                await notification.save();
+                await notification.populate([
+                    {
+                        path: 'sender',
+                    },
+                    {
+                        path: 'subject',
+                        populate: {
+                            path: 'entity',
+                        },
+                    },
+                ]);
 
                 req.io.emit('notification', notification);
             }
