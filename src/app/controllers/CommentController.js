@@ -131,6 +131,10 @@ class CommentController {
             ).populate('postedBy');
 
             req.io.emit('post-comment', populatedComment);
+            req.io.emit(
+                `${populatedComment.type}-post-comment`,
+                populatedComment.entityId
+            );
 
             return res.json({
                 success: true,
@@ -208,9 +212,18 @@ class CommentController {
                 });
             }
 
+            const repliedCommentResult = await Comment.deleteMany({
+                parentComment: req.params.id,
+            });
+
             req.io.emit('delete-comment', {
                 commentId: req.params.id,
                 parentCommentId: comment.parentComment,
+            });
+            req.io.emit(`${comment.type}-delete-comment`, {
+                entityId: comment.entityId,
+                deletedCount:
+                    repliedCommentResult.deletedCount + result.deletedCount,
             });
 
             return res.status(204).json({

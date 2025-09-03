@@ -94,12 +94,74 @@ class BlogController {
     async getBlog(req, res) {
         try {
             const blogData = await Promise.all([
-                Blog.findOne({
-                    slug: req.params.slug,
-                    schedule: null,
-                    isPosted: true,
-                })
-                    .populate('postedBy'),
+                Blog.aggregate([
+                    {
+                        $match: {
+                            slug: req.params.slug,
+                            schedule: null,
+                            isPosted: true,
+                        },
+                    },
+                    {
+                        $lookup: {
+                            from: 'users',
+                            localField: 'postedBy',
+                            foreignField: '_id',
+                            as: 'postedBy',
+                        },
+                    },
+                    {
+                        $unwind: {
+                            path: '$postedBy',
+                            preserveNullAndEmptyArrays: true,
+                        },
+                    },
+                    {
+                        $lookup: {
+                            from: 'comments',
+                            let: { blogId: '$_id' },
+                            pipeline: [
+                                {
+                                    $match: {
+                                        $expr: {
+                                            $and: [
+                                                {
+                                                    $eq: [
+                                                        '$entityId',
+                                                        '$$blogId',
+                                                    ],
+                                                },
+                                                { $eq: ['$type', 'blog'] },
+                                            ],
+                                        },
+                                    },
+                                },
+                                { $count: 'totalComments' },
+                            ],
+                            as: 'repliesCount',
+                        },
+                    },
+                    {
+                        $addFields: {
+                            totalComments: {
+                                $ifNull: [
+                                    {
+                                        $arrayElemAt: [
+                                            '$repliesCount.totalComments',
+                                            0,
+                                        ],
+                                    },
+                                    0,
+                                ],
+                            },
+                        },
+                    },
+                    {
+                        $project: {
+                            repliesCount: 0,
+                        },
+                    },
+                ]),
                 Blog.find({ isPopular: true, isPosted: true }).populate(
                     'postedBy',
                     '_id fullName bio photoURL'
@@ -107,7 +169,7 @@ class BlogController {
             ]);
 
             return res.json({
-                blogSlug: blogData[0],
+                blogSlug: blogData[0][0],
                 blogHighlight: blogData[1],
             });
         } catch (error) {
