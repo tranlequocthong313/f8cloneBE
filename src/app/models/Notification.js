@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { NotificationTypes } = require('./enum');
 const { ObjectId } = mongoose.Schema.Types;
 const { Schema } = mongoose;
 
@@ -12,16 +13,22 @@ const NotificationSchema = new Schema(
         receiver: {
             type: ObjectId,
             ref: 'users',
-            required: true,
+            required: false,
         },
         type: {
             type: String,
-            enum: ['comments', 'like', 'follow', 'mention', 'system'],
+            enum: Object.values(NotificationTypes),
             required: true,
         },
-        entityId: {
-            type: ObjectId, // points to blog, comment, etc.
-            required: false, // optional in case of system notifications
+        entity: {
+            type: ObjectId,
+            required: false,
+            refPath: 'entityModel',
+        },
+        entityModel: {
+            type: String,
+            required: false,
+            enum: ['blogs', 'comments'],
         },
         read: {
             type: Boolean,
@@ -29,7 +36,7 @@ const NotificationSchema = new Schema(
         },
     },
     {
-        timestamps: true, // includes createdAt, updatedAt
+        timestamps: true,
     }
 );
 

@@ -5,63 +5,56 @@ const Notification = require('../models/Notification');
 const cache = require('../../utils/Cache');
 
 class NotificationController {
-  // @route POST /new-notification
-  // @desc Post new notification
-  // @access Private
-  async newNotify(req, res) {
-    try {
-      await Notification.create(req.body);
+    // @route PUT /seen-notification
+    // @desc Seen notification
+    // @access Private
+    async seenNotification(req, res) {
+        try {
+            const result = await Notification.updateMany(
+                {
+                    _id: { $in: req.body.notificationId },
+                },
+                { $set: { read: true } }
+            );
 
-      const notification = await Notification.find({
-        sendFor: req.body.sendFor,
-      })
-        .populate('notifiedBy')
-        .sort({ createdAt: -1 });
-
-      return res.json(notification);
-    } catch (error) {
-      console.log(error.message);
+            return res.json({
+                message: 'Seen notification successfully!',
+                success: true,
+                updatedCount: result.modifiedCount,
+            });
+        } catch (error) {
+            console.log(error.message);
+            return res.status(500).json({
+                message: 'Internal server error',
+                success: false,
+            });
+        }
     }
-  }
 
-  // @route POST /seen-notification
-  // @desc Seen notification
-  // @access Private
-  async seenNotification(req, res) {
-    try {
-      console.log(req.body.notificationId);
-      await Notification.updateMany(
-        {
-          _id: { $in: req.body.notificationId },
-        },
-        { $set: { isSeen: true } }
-      );
-      const notification = await Notification.find({ sendFor: req._id })
-        .populate('notifiedBy')
-        .sort({ createdAt: -1 });
+    // @route GET /
+    // @desc Get notifications
+    // @access Private
+    async getNotification(req, res) {
+        try {
+            const notifications = await Notification.find({
+                receiver: req._id,
+            })
+                .populate(['sender', 'entity'])
+                .sort({ createdAt: -1 });
 
-      res.json(notification);
-    } catch (error) {
-      console.log(error.message);
+            return res.json({
+                message: 'Get notifications successfully!',
+                success: true,
+                notifications,
+            });
+        } catch (error) {
+            console.log(error.message);
+            return res.status(500).json({
+                message: 'Internal server error',
+                success: false,
+            });
+        }
     }
-  }
-
-  // @route GET /
-  // @desc Get notification
-  // @access Private
-  async getNotification(req, res) {
-    try {
-      const notification = await Notification.find({
-        sendFor: req._id,
-      })
-        .populate('notifiedBy')
-        .sort({ createdAt: -1 });
-
-      res.json(notification);
-    } catch (error) {
-      console.log(error.message);
-    }
-  }
 }
 
 module.exports = new NotificationController();

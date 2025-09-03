@@ -4,7 +4,7 @@ const { ObjectId } = mongoose.Schema.Types;
 
 const CommentSchema = new Schema(
     {
-        content: {type: String,  required: true},
+        content: { type: String, required: true },
         postedBy: { type: ObjectId, ref: 'users', required: true },
         isCode: { type: Boolean, default: false },
         parentComment: { type: ObjectId, ref: 'comments', default: null },
@@ -19,19 +19,19 @@ const CommentSchema = new Schema(
                 },
             },
         ],
-        type: {
+        entityModel: {
             type: String,
             enum: ['blogs', 'courses'],
             required: true,
         },
-        entityId: { type: ObjectId, required: true },
+        entity: { type: ObjectId, required: true, refPath: 'entityModel' },
     },
     {
         timestamps: true,
     }
 );
 
-CommentSchema.index({ entityId: 1, type: 1 });
+CommentSchema.index({ entity: 1, entityModel: 1 });
 CommentSchema.index({ parentComment: 1 });
 CommentSchema.index({ 'reacts.reactedBy': 1 });
 

@@ -2,6 +2,8 @@ const Blog = require('../models/Blog');
 const User = require('../models/User');
 const schedule = require('node-schedule');
 const cache = require('../../utils/Cache');
+const { NotificationTypes } = require('../models/enum');
+const Notification = require('../models/Notification');
 
 class BlogController {
     // @route POST /new-post
@@ -127,11 +129,11 @@ class BlogController {
                                             $and: [
                                                 {
                                                     $eq: [
-                                                        '$entityId',
+                                                        '$entity',
                                                         '$$blogId',
                                                     ],
                                                 },
-                                                { $eq: ['$type', 'blog'] },
+                                                { $eq: ['$entityModel', 'blog'] },
                                             ],
                                         },
                                     },
@@ -256,11 +258,11 @@ class BlogController {
     // @access Private
     async like(req, res) {
         try {
-            const liked = await Blog.where('_id')
-                .equals(req.body.blogId)
-                .select('likes');
+            const blog = await Blog.findById(req.body.blogId).select(
+                'likes postedBy'
+            );
 
-            const isLikedBlog = liked[0].likes.includes(req._id);
+            const isLikedBlog = blog.likes.includes(req._id);
             if (isLikedBlog) {
                 const likes = await Blog.findByIdAndUpdate(
                     req.body.blogId,
@@ -279,6 +281,34 @@ class BlogController {
                 },
                 { new: true }
             ).select('likes slug postedBy');
+
+            if (req._id !== blog.postedBy) {
+                let notification = await Notification.findOne({
+                    sender: req._id,
+                    receiver: blog.postedBy,
+                    type: NotificationTypes.LIKE_BLOG,
+                    entity: blog._id,
+                    entityModel: 'blogs',
+                }).populate(['sender', 'entity']);
+
+                if (notification) {
+                    notification.read = false;
+                    await notification.save();
+                } else {
+                    notification = new Notification({
+                        sender: req._id,
+                        receiver: blog.postedBy,
+                        type: NotificationTypes.LIKE_BLOG,
+                        entity: blog._id,
+                        entityModel: 'blogs',
+                    });
+
+                    await notification.save();
+                    await notification.populate(['sender', 'entity']);
+                }
+
+                req.io.emit('notification', notification);
+            }
 
             return res.json(likes);
         } catch (error) {

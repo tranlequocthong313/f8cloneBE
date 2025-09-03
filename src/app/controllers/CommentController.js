@@ -1,4 +1,6 @@
 const Comment = require('../models/Comment');
+const { NotificationTypes } = require('../models/enum');
+const Notification = require('../models/Notification');
 const { ObjectId } = require('mongoose').Types;
 
 class CommentController {
@@ -19,8 +21,8 @@ class CommentController {
             const comments = await Comment.aggregate([
                 {
                     $match: {
-                        entityId: new ObjectId(entityId),
-                        type,
+                        entity: new ObjectId(entityId),
+                        entityModel: type,
                         parentComment: null,
                     },
                 },
@@ -121,28 +123,45 @@ class CommentController {
     // @access Private
     async postComment(req, res) {
         try {
-            const comment = await Comment.create({
+            const comment = new Comment({
                 ...req.body,
+                entityModel: req.body.type,
+                entity: req.body.entityId,
                 postedBy: req._id,
             });
 
-            const populatedComment = await Comment.findById(
-                comment._id
-            ).populate('postedBy');
+            await comment.save();
+            await comment.populate(['postedBy', 'entity']);
 
-            req.io.emit('post-comment', populatedComment);
+            console.log('enitty', comment);
+            req.io.emit('post-comment', comment);
             req.io.emit(
-                `${populatedComment.type}-post-comment`,
-                populatedComment.entityId
+                `${comment.entityModel}-post-comment`,
+                comment.entity._id
             );
+
+            if (req._id !== comment.entity.postedBy) {
+                const notification = new Notification({
+                    sender: req._id,
+                    receiver: comment.entity.postedBy,
+                    type: NotificationTypes.COMMENT_BLOG,
+                    entity: comment.entity._id,
+                    entityModel: comment.entityModel,
+                });
+
+                await notification.save();
+                await notification.populate(['sender', 'entity']);
+
+                req.io.emit('notification', notification);
+            }
 
             return res.json({
                 success: true,
                 message: 'Post comment successfully!',
-                comment: populatedComment,
+                comment,
             });
         } catch (error) {
-            console.log(error.message);
+            console.log(error);
             return res.status(500).json({
                 success: false,
                 message: 'Internal server error',
@@ -220,8 +239,8 @@ class CommentController {
                 commentId: req.params.id,
                 parentCommentId: comment.parentComment,
             });
-            req.io.emit(`${comment.type}-delete-comment`, {
-                entityId: comment.entityId,
+            req.io.emit(`${comment.entityModel}-delete-comment`, {
+                entityId: comment.entity,
                 deletedCount:
                     repliedCommentResult.deletedCount + result.deletedCount,
             });

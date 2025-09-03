@@ -9,8 +9,9 @@ class AdminController {
     async createCourse(req, res) {
         try {
             const course = await Course.create({
-              ...req.body,
-              search: req.body?.title?.toLowerCase()
+                ...req.body,
+                search: req.body?.title?.toLowerCase(),
+                createdBy: req._id,
             });
             return res.json({
                 success: true,
