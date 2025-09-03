@@ -19,7 +19,7 @@ class AdminController {
                 course,
             });
         } catch (error) {
-            console.log(error.message);
+            console.log(error);
             return res.json({
                 success: false,
                 message: 'Create Failed!',
@@ -44,7 +44,7 @@ class AdminController {
                 message: 'Successfully!',
             });
         } catch (error) {
-            console.log(error.message);
+            console.log(error);
             return res.json({
                 success: false,
                 message: 'Internal Error!',
@@ -66,7 +66,7 @@ class AdminController {
                 blog,
             });
         } catch (error) {
-            console.log(error.message);
+            console.log(error);
             return res.json({
                 success: false,
                 message: 'Delete Failed!',
@@ -92,7 +92,7 @@ class AdminController {
                 blog,
             });
         } catch (error) {
-            console.log(error.message);
+            console.log(error);
             return res.json({
                 success: false,
                 message: 'Add Failed!',
@@ -112,7 +112,7 @@ class AdminController {
                 video,
             });
         } catch (error) {
-            console.log(error.message);
+            console.log(error);
             return res.json({
                 success: false,
                 message: 'Create Failed!',
@@ -134,7 +134,7 @@ class AdminController {
                 video,
             });
         } catch (error) {
-            console.log(error.message);
+            console.log(error);
             return res.json({
                 success: false,
                 message: 'Delete Failed!',
@@ -160,7 +160,7 @@ class AdminController {
                 video,
             });
         } catch (error) {
-            console.log(error.message);
+            console.log(error);
             return res.json({
                 success: false,
                 message: 'Add Popular Failed!',
@@ -187,7 +187,7 @@ class AdminController {
                 videos: data[2],
             });
         } catch (error) {
-            console.log(error.message);
+            console.log(error);
             return {
                 success: false,
                 message: 'Internal error!',

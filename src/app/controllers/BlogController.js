@@ -36,7 +36,7 @@ class BlogController {
                 blog,
             });
         } catch (error) {
-            console.log(error.message);
+            console.log(error);
             return res.json({
                 success: false,
                 message: 'Post blog failed!',
@@ -59,7 +59,7 @@ class BlogController {
 
             return res.json(allBlog);
         } catch (error) {
-            console.log(error.message);
+            console.log(error);
             return res.json({
                 success: false,
                 message: 'Get blog failed!',
@@ -82,7 +82,7 @@ class BlogController {
 
             return res.json(allBlog);
         } catch (error) {
-            console.log(error.message);
+            console.log(error);
             return res.json({
                 success: false,
                 message: 'Get blog failed!',
@@ -133,7 +133,7 @@ class BlogController {
                                                         '$$blogId',
                                                     ],
                                                 },
-                                                { $eq: ['$entityModel', 'blog'] },
+                                                { $eq: ['$entityModel', 'blogs'] },
                                             ],
                                         },
                                     },
@@ -175,7 +175,7 @@ class BlogController {
                 blogHighlight: blogData[1],
             });
         } catch (error) {
-            console.log(error.message);
+            console.log(error);
             return res.json({
                 success: false,
                 message: 'Get blog failed!',
@@ -199,7 +199,7 @@ class BlogController {
 
             return res.json(blogTagData);
         } catch (error) {
-            console.log(error.message);
+            console.log(error);
         }
     }
 
@@ -245,7 +245,7 @@ class BlogController {
 
             return res.json(blogSameAuthor);
         } catch (error) {
-            console.log(error.message);
+            console.log(error);
             return res.json({
                 success: false,
                 message: 'Get blog failed!',
@@ -282,7 +282,7 @@ class BlogController {
                 { new: true }
             ).select('likes slug postedBy');
 
-            if (req._id !== blog.postedBy) {
+            if (req._id !== blog.postedBy.toString()) {
                 let notification = await Notification.findOne({
                     sender: req._id,
                     receiver: blog.postedBy,
@@ -304,7 +304,7 @@ class BlogController {
                     });
 
                     await notification.save();
-                    await notification.populate(['sender', 'entity']);
+                    await notification.populate(['sender', 'subject']);
                 }
 
                 req.io.emit('notification', notification);
@@ -312,7 +312,7 @@ class BlogController {
 
             return res.json(likes);
         } catch (error) {
-            console.log(error.message);
+            console.log(error);
         }
     }
 
@@ -334,7 +334,7 @@ class BlogController {
                 blog,
             });
         } catch (error) {
-            console.log(error.message);
+            console.log(error);
             return res.json({
                 success: false,
                 message: 'Create Failed!',

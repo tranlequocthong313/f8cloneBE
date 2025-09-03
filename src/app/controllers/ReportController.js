@@ -17,7 +17,7 @@ class ReportController {
                 report,
             });
         } catch (error) {
-            console.log(error.message);
+            console.log(error);
             return res.json({
                 success: false,
                 message: 'Report failed!',
@@ -41,7 +41,7 @@ class ReportController {
                 report,
             });
         } catch (error) {
-            console.log(error.message);
+            console.log(error);
             return res.json({
                 success: false,
                 message: 'Report failed!',

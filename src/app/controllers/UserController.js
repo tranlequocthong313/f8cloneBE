@@ -21,7 +21,7 @@ class UserController {
                 ? res.json({ success: false, message: 'User not found' })
                 : res.json({ success: true, message: 'Is Valid token', user });
         } catch (error) {
-            console.log(error.message);
+            console.log(error);
             return res.json({
                 success: false,
                 message: 'Internal server error!',
@@ -90,7 +90,7 @@ class UserController {
                 user,
             });
         } catch (error) {
-            console.log(error.message);
+            console.log(error);
             return res.json({ success: false, message: 'Internal error' });
         }
     }
@@ -140,7 +140,7 @@ class UserController {
                 accessToken,
             });
         } catch (error) {
-            console.log(error.message);
+            console.log(error);
             return res.json({
                 success: false,
                 message: 'Lỗi hệ thống',
@@ -241,7 +241,7 @@ class UserController {
                 accessToken,
             });
         } catch (error) {
-            console.log(error.message);
+            console.log(error);
             return res.json({
                 success: false,
                 message: 'Login failed!',
@@ -275,7 +275,7 @@ class UserController {
                 }),
             });
         } catch (error) {
-            console.log(error.message);
+            console.log(error);
         }
     }
 
@@ -294,7 +294,7 @@ class UserController {
                       used: 'Email đã được sử dụng',
                   });
         } catch (error) {
-            console.log(error.message);
+            console.log(error);
         }
     }
 
@@ -340,7 +340,7 @@ class UserController {
                 message: 'Password has been reset',
             });
         } catch (error) {
-            console.log(error.message);
+            console.log(error);
             return res.json({
                 success: false,
                 message: 'Failed',
@@ -382,7 +382,7 @@ class UserController {
 
             return res.json(bookmark);
         } catch (error) {
-            console.log(error.message);
+            console.log(error);
         }
     }
 
@@ -395,7 +395,7 @@ class UserController {
 
             return res.json(bookmark);
         } catch (error) {
-            console.log(error.message);
+            console.log(error);
         }
     }
 
@@ -414,7 +414,7 @@ class UserController {
 
             return res.json(bookmark);
         } catch (error) {
-            console.log(error.message);
+            console.log(error);
         }
     }
 

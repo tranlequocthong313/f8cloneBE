@@ -20,7 +20,7 @@ const cache = async (key, callback) => {
     client.setEx(key, DEFAULT_EXPIRATION, JSON.stringify(data));
     return data;
   } catch (error) {
-    console.log(error.message);
+    console.log(error);
   }
 };
 

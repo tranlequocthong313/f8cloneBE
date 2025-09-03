@@ -34,7 +34,7 @@ class SiteController {
                 videos: data[3],
             });
         } catch (error) {
-            console.log(error.message);
+            console.log(error);
             return res.status(500).json({
                 success: false,
                 message: 'Internal server error',

@@ -109,7 +109,7 @@ class HelpController {
 
             return res.json(myBlog);
         } catch (error) {
-            console.log(error.message);
+            console.log(error);
             return res.json({
                 success: false,
                 message: 'Get my blog failed!',
@@ -134,7 +134,7 @@ class HelpController {
 
             return res.json(jobs);
         } catch (error) {
-            console.log(error.message);
+            console.log(error);
         }
     }
 
@@ -147,7 +147,7 @@ class HelpController {
 
             return res.json(jobs);
         } catch (error) {
-            console.log(error.message);
+            console.log(error);
         }
     }
 
@@ -244,7 +244,7 @@ class HelpController {
                 videos: data[2],
             });
         } catch (error) {
-            console.log(error.message);
+            console.log(error);
         }
     }
 

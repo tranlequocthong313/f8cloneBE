@@ -78,7 +78,7 @@ class CommentController {
                 comments,
             });
         } catch (error) {
-            console.error(error.message);
+            console.error(error);
             return res.status(500).json({
                 success: false,
                 message: 'Internal server error',
@@ -110,7 +110,7 @@ class CommentController {
                 comments,
             });
         } catch (error) {
-            console.error(error.message);
+            console.error(error);
             return res.status(500).json({
                 success: false,
                 message: 'Internal server error',
@@ -131,26 +131,32 @@ class CommentController {
             });
 
             await comment.save();
-            await comment.populate(['postedBy', 'entity']);
+            await comment.populate([
+                {
+                    path: 'entity',
+                },
+                {
+                    path: 'postedBy',
+                },
+            ]);
 
-            console.log('enitty', comment);
             req.io.emit('post-comment', comment);
             req.io.emit(
                 `${comment.entityModel}-post-comment`,
                 comment.entity._id
             );
 
-            if (req._id !== comment.entity.postedBy) {
+            if (req._id !== comment.entity.postedBy.toString()) {
                 const notification = new Notification({
                     sender: req._id,
                     receiver: comment.entity.postedBy,
                     type: NotificationTypes.COMMENT_BLOG,
-                    entity: comment.entity._id,
-                    entityModel: comment.entityModel,
+                    subject: comment.entity._id,
+                    subjectModel: comment.entityModel,
                 });
 
                 await notification.save();
-                await notification.populate(['sender', 'entity']);
+                await notification.populate(['sender', 'subject']);
 
                 req.io.emit('notification', notification);
             }
@@ -202,7 +208,7 @@ class CommentController {
                 comment,
             });
         } catch (error) {
-            console.log(error.message);
+            console.log(error);
             return res.status(500).json({
                 success: false,
                 message: 'Internal server error',
@@ -250,7 +256,7 @@ class CommentController {
                 message: 'Delete comment successfully!',
             });
         } catch (error) {
-            console.log(error.message);
+            console.log(error);
             return res.status(500).json({
                 success: false,
                 message: 'Internal server error',
@@ -266,9 +272,10 @@ class CommentController {
             const userId = req._id;
             const { emoji } = req.body;
 
-            const comment = await Comment.findById(req.params.id).populate(
-                'postedBy'
-            );
+            const comment = await Comment.findById(req.params.id).populate([
+                'postedBy',
+                'entity',
+            ]);
 
             if (!comment) {
                 return res.status(404).json({
@@ -300,13 +307,57 @@ class CommentController {
 
             req.io.emit('edit-comment', comment);
 
+            if (req._id !== comment.postedBy._id.toString()) {
+                let notification = await Notification.findOne({
+                    sender: req._id,
+                    receiver: comment.postedBy._id,
+                    type: NotificationTypes.REACT_COMMENT_BLOG,
+                    subject: comment._id,
+                    subjectModel: 'comments',
+                }).populate([
+                    { path: 'sender' },
+                    {
+                        path: 'subject',
+                        populate: {
+                            path: 'entity',
+                        },
+                    },
+                ]);
+
+                if (notification) {
+                    notification.read = false;
+                    await notification.save();
+                } else {
+                    notification = new Notification({
+                        sender: req._id,
+                        receiver: comment.postedBy._id,
+                        type: NotificationTypes.REACT_COMMENT_BLOG,
+                        subject: comment._id,
+                        subjectModel: 'comments',
+                    });
+
+                    await notification.save();
+                    await notification.populate([
+                        { path: 'sender' },
+                        {
+                            path: 'subject',
+                            populate: {
+                                path: 'entity',
+                            },
+                        },
+                    ]);
+                }
+
+                req.io.emit('notification', notification);
+            }
+
             return res.json({
                 success: true,
                 message: 'React comment successfully!',
                 comment,
             });
         } catch (error) {
-            console.log(error.message);
+            console.log(error);
             return res.status(500).json({
                 success: false,
                 message: 'Internal server error',

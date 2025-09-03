@@ -20,12 +20,12 @@ const NotificationSchema = new Schema(
             enum: Object.values(NotificationTypes),
             required: true,
         },
-        entity: {
+        subject: {
             type: ObjectId,
             required: false,
-            refPath: 'entityModel',
+            refPath: 'subjectModel',
         },
-        entityModel: {
+        subjectModel: {
             type: String,
             required: false,
             enum: ['blogs', 'comments'],

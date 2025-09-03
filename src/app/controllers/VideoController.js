@@ -13,7 +13,7 @@ class VideoController {
         video,
       });
     } catch (error) {
-      console.log(error.message);
+      console.log(error);
       return res.json({
         success: false,
         message: 'Create Failed!',
@@ -36,7 +36,7 @@ class VideoController {
         video,
       });
     } catch (error) {
-      console.log(error.message);
+      console.log(error);
       return res.json({
         success: false,
         message: 'Create Failed!',
@@ -62,7 +62,7 @@ class VideoController {
         video,
       });
     } catch (error) {
-      console.log(error.message);
+      console.log(error);
       return res.json({
         success: false,
         message: 'Create Failed!',

@@ -30,7 +30,7 @@ class CourseController {
 
             return res.json(course);
         } catch (error) {
-            console.log(error.message);
+            console.log(error);
             return {
                 success: false,
                 message: 'Internal error!',
@@ -57,7 +57,7 @@ class CourseController {
                 courseBE: data[1],
             });
         } catch (error) {
-            console.log(error.message);
+            console.log(error);
             return {
                 success: false,
                 message: 'Internal error!',
@@ -121,7 +121,7 @@ class CourseController {
                 course,
             });
         } catch (error) {
-            console.log(error.message);
+            console.log(error);
             return res.json({
                 success: false,
                 message: 'Enroll failed!',
