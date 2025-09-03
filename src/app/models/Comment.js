@@ -21,7 +21,7 @@ const CommentSchema = new Schema(
         ],
         type: {
             type: String,
-            enum: ['blog', 'course'],
+            enum: ['blogs', 'courses'],
             required: true,
         },
         entityId: { type: ObjectId, required: true },
