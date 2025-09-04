@@ -8,26 +8,14 @@ class CourseController {
     // @access Public
     async getCourse(req, res) {
         try {
-            if (req.query.id) {
-                const id = req.query.id;
-                console.log(id);
-                const course = await Course.findOne({
-                    episode: {
-                        $elemMatch: {
-                            lessons: {
-                                $elemMatch: {
-                                    id: id,
-                                },
-                            },
-                        },
-                    },
-                });
-
-                console.log('Lesson', course);
-            }
-
-            const course = await Course.findOne({ slug: req.params.slug });
-
+            const course = await Course.findOne({
+                slug: req.params.slug,
+            }).populate({
+                path: 'episodes',
+                populate: {
+                    path: 'lessons',
+                },
+            });
             return res.json(course);
         } catch (error) {
             console.log(error);
@@ -80,7 +68,12 @@ class CourseController {
                     .json({ success: false, message: 'User not found' });
             }
 
-            const course = await Course.findById(courseId);
+            const course = await Course.findById(courseId).populate({
+                path: 'episodes',
+                populate: {
+                    path: 'lessons',
+                },
+            });
             if (!course) {
                 return res
                     .status(404)
@@ -100,7 +93,7 @@ class CourseController {
             course.studentCount += 1;
             await course.save();
 
-            const lessons = course.episode.flatMap((ep) => ep.lessons);
+            const lessons = course.episodes.flatMap((ep) => ep.lessons);
             const lessonProgress = lessons.map((lesson, index) => ({
                 lessonId: lesson._id,
                 status: index === 0 ? 'in-progress' : 'locked',
@@ -162,10 +155,6 @@ class CourseController {
     async updateLearningProgress(req, res) {
         try {
             const { lessonId } = req.body;
-            console.log(
-                '🚀 ~ CourseController ~ updateLearningProgress ~ lessonId:',
-                lessonId
-            );
 
             const progress = await LearnProgress.findOne({
                 courseId: req.params.id,

@@ -1,24 +1,103 @@
 const Blog = require('../models/Blog');
 const Course = require('../models/Course');
 const Video = require('../models/Video');
+const Lesson = require('../models/Lesson');
+const Episode = require('../models/Episode');
 
 class AdminController {
     // @route POST /courses/create
     // @desc Create course
     // @access Private
     async createCourse(req, res) {
+        const session = await Course.startSession();
+        session.startTransaction();
+
         try {
-            const course = await Course.create({
-                ...req.body,
-                search: req.body?.title?.toLowerCase(),
-                createdBy: req._id,
-            });
+            const {
+                title,
+                description,
+                videoId,
+                image,
+                level,
+                topics,
+                requirement,
+                episodes,
+            } = req.body;
+
+            const course = await Course.create(
+                [
+                    {
+                        title,
+                        description,
+                        videoId,
+                        image,
+                        level,
+                        topics,
+                        requirement,
+                        search: title?.toLowerCase(),
+                        createdBy: req._id,
+                    },
+                ],
+                { session }
+            );
+
+            const courseDoc = course[0];
+            const episodeIds = [];
+
+            for (const ep of episodes || []) {
+                const lessonIds = [];
+
+                for (const lesson of ep.lessons || []) {
+                    const lessonDoc = await Lesson.create(
+                        [
+                            {
+                                title: lesson.title,
+                                time: lesson.time,
+                                videoId: lesson.videoId,
+                                episodeId: null,
+                                courseId: courseDoc._id,
+                            },
+                        ],
+                        { session }
+                    );
+
+                    lessonIds.push(lessonDoc[0]._id);
+                }
+
+                const episodeDoc = await Episode.create(
+                    [
+                        {
+                            title: ep.title,
+                            courseId: courseDoc._id,
+                            lessons: lessonIds,
+                        },
+                    ],
+                    { session }
+                );
+
+                episodeIds.push(episodeDoc[0]._id);
+
+                await Lesson.updateMany(
+                    { _id: { $in: lessonIds } },
+                    { $set: { episodeId: episodeDoc[0]._id } },
+                    { session }
+                );
+            }
+
+            courseDoc.episodes = episodeIds;
+            await courseDoc.save({ session });
+
+            await session.commitTransaction();
+            session.endSession();
+
             return res.json({
                 success: true,
                 message: 'Create Successfully!',
-                course,
+                course: courseDoc,
             });
         } catch (error) {
+            await session.abortTransaction();
+            session.endSession();
             console.log(error);
             return res.json({
                 success: false,
