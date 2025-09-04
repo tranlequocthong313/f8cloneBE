@@ -133,7 +133,12 @@ class BlogController {
                                                         '$$blogId',
                                                     ],
                                                 },
-                                                { $eq: ['$entityModel', 'blogs'] },
+                                                {
+                                                    $eq: [
+                                                        '$entityModel',
+                                                        'blogs',
+                                                    ],
+                                                },
                                             ],
                                         },
                                     },
@@ -272,6 +277,8 @@ class BlogController {
                     { new: true }
                 ).select('likes slug postedBy');
 
+                req.io.emit('like_blog', likes);
+
                 return res.json(likes);
             }
             const likes = await Blog.findByIdAndUpdate(
@@ -287,9 +294,9 @@ class BlogController {
                     sender: req._id,
                     receiver: blog.postedBy,
                     type: NotificationTypes.LIKE_BLOG,
-                    entity: blog._id,
-                    entityModel: 'blogs',
-                }).populate(['sender', 'entity']);
+                    subject: blog._id,
+                    subjectModel: 'blogs',
+                }).populate(['sender', 'subject']);
 
                 if (notification) {
                     notification.read = false;
@@ -299,8 +306,8 @@ class BlogController {
                         sender: req._id,
                         receiver: blog.postedBy,
                         type: NotificationTypes.LIKE_BLOG,
-                        entity: blog._id,
-                        entityModel: 'blogs',
+                        subject: blog._id,
+                        subjectModel: 'blogs',
                     });
 
                     await notification.save();
@@ -309,6 +316,8 @@ class BlogController {
 
                 req.io.emit('notification', notification);
             }
+
+            req.io.emit('like_blog', likes);
 
             return res.json(likes);
         } catch (error) {
