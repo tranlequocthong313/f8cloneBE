@@ -31,6 +31,7 @@ const CourseSchema = new Schema(
         requirement: [String],
         episodes: [{ type: ObjectId, ref: 'episodes' }],
         role: String,
+        postedBy: { type: ObjectId, ref: 'users' },
     },
     {
         timestamps: true,

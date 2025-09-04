@@ -40,12 +40,15 @@ class NotificationController {
                 receiver: req._id,
             })
                 .populate('sender')
-                .populate('subject') 
+                .populate('subject')
                 .sort({ createdAt: -1 });
 
             for (let notif of notifications) {
                 if (notif.subject?.constructor?.modelName === 'comments') {
                     await notif.subject.populate('entity');
+                }
+                if (notif.subject?.constructor?.modelName === 'lessons') {
+                    await notif.subject.populate('course');
                 }
             }
 

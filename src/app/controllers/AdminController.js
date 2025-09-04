@@ -35,7 +35,7 @@ class AdminController {
                         topics,
                         requirement,
                         search: title?.toLowerCase(),
-                        createdBy: req._id,
+                        postedBy: req._id,
                     },
                 ],
                 { session }

@@ -131,7 +131,16 @@ class CommentController {
             });
 
             await comment.save();
-            await comment.populate(['entity', , 'postedBy', 'parentComment']);
+            await comment.populate(['entity', 'postedBy', 'parentComment']);
+
+            if (comment.entityModel === 'lessons') {
+                await comment.populate({
+                    path: 'entity',
+                    populate: {
+                        path: 'course',
+                    },
+                });
+            }
 
             req.io.emit('post-comment', comment);
             req.io.emit(
@@ -139,14 +148,18 @@ class CommentController {
                 comment.entity._id
             );
 
-            if (
-                req._id !== comment.entity.postedBy.toString() &&
-                !comment.parentComment
-            ) {
+            let receiver;
+            if (comment.entityModel === 'lessons') {
+                receiver = comment.entity.course.postedBy.toString();
+            } else if (comment.entityModel === 'blogs') {
+                receiver = comment.entity.postedBy.toString();
+            }
+
+            if (req._id !== receiver && !comment.parentComment) {
                 const notification = new Notification({
                     sender: req._id,
-                    receiver: comment.entity.postedBy,
-                    type: NotificationTypes.COMMENT_BLOG,
+                    receiver,
+                    type: NotificationTypes.COMMENT,
                     subject: comment.entity._id,
                     subjectModel: comment.entityModel,
                 });
@@ -154,13 +167,25 @@ class CommentController {
                 await notification.save();
                 await notification.populate(['sender', 'subject']);
 
+                if (comment.entityModel === 'lessons') {
+                    await notification.populate({
+                        path: 'subject',
+                        populate: {
+                            path: 'course',
+                        },
+                    });
+                }
+
                 req.io.emit('notification', notification);
-            } else if (req._id !== comment.parentComment.postedBy.toString()) {
+            } else if (
+                comment.parentComment &&
+                req._id !== comment.parentComment.postedBy.toString()
+            ) {
                 const notification = new Notification({
                     sender: req._id,
                     receiver: comment.parentComment.postedBy,
-                    type: NotificationTypes.REPLY_COMMENT_BLOG,
-                    subject: comment.parentComment._id,
+                    type: NotificationTypes.REPLY_COMMENT,
+                    subject: comment._id,
                     subjectModel: 'comments',
                 });
 
@@ -330,7 +355,7 @@ class CommentController {
                 let notification = await Notification.findOne({
                     sender: req._id,
                     receiver: comment.postedBy._id,
-                    type: NotificationTypes.REACT_COMMENT_BLOG,
+                    type: NotificationTypes.REACT_COMMENT,
                     subject: comment._id,
                     subjectModel: 'comments',
                 }).populate([
@@ -350,7 +375,7 @@ class CommentController {
                     notification = new Notification({
                         sender: req._id,
                         receiver: comment.postedBy._id,
-                        type: NotificationTypes.REACT_COMMENT_BLOG,
+                        type: NotificationTypes.REACT_COMMENT,
                         subject: comment._id,
                         subjectModel: 'comments',
                     });

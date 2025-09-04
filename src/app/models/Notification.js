@@ -28,7 +28,7 @@ const NotificationSchema = new Schema(
         subjectModel: {
             type: String,
             required: false,
-            enum: ['blogs', 'comments'],
+            enum: ['blogs', 'comments', 'lessons'],
         },
         read: {
             type: Boolean,
