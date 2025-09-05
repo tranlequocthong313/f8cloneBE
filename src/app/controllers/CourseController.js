@@ -31,29 +31,29 @@ class CourseController {
     // @route GET /courses
     // @desc Get all course by role
     // @access Public
-    async getCourseByRole(req, res) {
-        try {
-            const data = await Promise.all([
-                Course.find({ role: { $in: ['FE', 'Fullstack'] } })
-                    .select('id slug image title studentCount')
-                    .lean(),
-                Course.find({ role: { $in: ['FE', 'Fullstack'] } })
-                    .select('id slug image title studentCount')
-                    .lean(),
-            ]);
+    // async getCourseByRole(req, res) {
+    //     try {
+    //         const data = await Promise.all([
+    //             Course.find({ role: { $in: ['FE', 'Fullstack'] } })
+    //                 .select('id slug image title studentCount')
+    //                 .lean(),
+    //             Course.find({ role: { $in: ['FE', 'Fullstack'] } })
+    //                 .select('id slug image title studentCount')
+    //                 .lean(),
+    //         ]);
 
-            return res.json({
-                courseFE: data[0],
-                courseBE: data[1],
-            });
-        } catch (error) {
-            console.log(error);
-            return {
-                success: false,
-                message: 'Internal error!',
-            };
-        }
-    }
+    //         return res.json({
+    //             courseFE: data[0],
+    //             courseBE: data[1],
+    //         });
+    //     } catch (error) {
+    //         console.log(error);
+    //         return {
+    //             success: false,
+    //             message: 'Internal error!',
+    //         };
+    //     }
+    // }
 
     // @route PUT /courses/:id/enroll/
     // @desc Enroll course

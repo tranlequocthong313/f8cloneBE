@@ -60,7 +60,12 @@ CommentSchema.pre('findOneAndUpdate', async function (next) {
     next();
 });
 
-CommentSchema.index({ entity: 1, entityModel: 1 });
+CommentSchema.index({
+    entity: 1,
+    entityModel: 1,
+    parentComment: 1,
+    createdAt: -1,
+});
 CommentSchema.index({ parentComment: 1 });
 CommentSchema.index({ 'reacts.reactedBy': 1 });
 

@@ -11,6 +11,6 @@ router.put(
 );
 router.put('/:id/enroll', verifyToken, courseController.enrollCourse);
 router.get('/:slug', courseController.getCourse);
-router.get('/', courseController.getCourseByRole);
+// router.get('/', courseController.getCourseByRole);
 
 module.exports = router;

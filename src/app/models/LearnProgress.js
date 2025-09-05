@@ -19,4 +19,9 @@ const LearnProgressSchema = new Schema({
     lessons: [userLessonProgressSchema],
 });
 
+LearnProgressSchema.index({
+    userId: 1,
+    courseId: 1,
+});
+
 module.exports = mongoose.model('learn_progress', LearnProgressSchema);

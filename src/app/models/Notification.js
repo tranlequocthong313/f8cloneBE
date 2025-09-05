@@ -40,4 +40,9 @@ const NotificationSchema = new Schema(
     }
 );
 
+NotificationSchema.index({
+    receiver: 1,
+    updatedAt: -1,
+});
+
 module.exports = mongoose.model('notifications', NotificationSchema);
