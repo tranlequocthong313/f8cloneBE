@@ -142,6 +142,14 @@ class CommentController {
                 });
             }
 
+            const { repliedCommentId, parentComment } = req.body;
+            let repliedComment;
+            if (repliedCommentId) {
+                repliedComment = await Comment.findById(
+                    repliedCommentId
+                ).populate('postedBy');
+            }
+
             req.io.emit('post-comment', comment);
             req.io.emit(
                 `${comment.entityModel}-post-comment`,
@@ -160,30 +168,18 @@ class CommentController {
                     sender: req._id,
                     receiver,
                     type: NotificationTypes.COMMENT,
-                    subject: comment.entity._id,
-                    subjectModel: comment.entityModel,
+                    subject: comment._id,
+                    subjectModel: 'comments',
                 });
 
                 await notification.save();
                 await notification.populate(['sender', 'subject']);
 
-                if (comment.entityModel === 'lessons') {
-                    await notification.populate({
-                        path: 'subject',
-                        populate: {
-                            path: 'course',
-                        },
-                    });
-                }
-
                 req.io.emit('notification', notification);
-            } else if (
-                comment.parentComment &&
-                req._id !== comment.parentComment.postedBy.toString()
-            ) {
+            } else if (req._id !== repliedComment.postedBy._id.toString()) {
                 const notification = new Notification({
                     sender: req._id,
-                    receiver: comment.parentComment.postedBy,
+                    receiver: repliedComment.postedBy._id,
                     type: NotificationTypes.REPLY_COMMENT,
                     subject: comment._id,
                     subjectModel: 'comments',

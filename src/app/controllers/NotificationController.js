@@ -36,21 +36,10 @@ class NotificationController {
     // @access Private
     async getNotification(req, res) {
         try {
-            let notifications = await Notification.find({
-                receiver: req._id,
-            })
-                .populate('sender')
-                .populate('subject')
-                .sort({ createdAt: -1 });
-
-            for (let notif of notifications) {
-                if (notif.subject?.constructor?.modelName === 'comments') {
-                    await notif.subject.populate('entity');
-                }
-                if (notif.subject?.constructor?.modelName === 'lessons') {
-                    await notif.subject.populate('course');
-                }
-            }
+            const notifications = await Notification.find({ receiver: req._id })
+                .populate(['sender', 'subject'])
+                .sort({ updatedAt: -1 })
+                .lean();
 
             return res.json({
                 message: 'Get notifications successfully!',

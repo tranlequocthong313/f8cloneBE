@@ -9,7 +9,7 @@ const LessonSchema = new Schema(
         videoId: String,
         courseId: { type: ObjectId, ref: 'courses' },
         episodeId: { type: ObjectId, ref: 'episodes' },
-        courseSlug: { type: String },
+        slug: { type: String },
     },
     {
         timestamps: true,
@@ -23,13 +23,13 @@ LessonSchema.virtual('course', {
     justOne: true,
 });
 
-// Auto-set courseSlug before saving
+// Auto-set slug before saving
 LessonSchema.pre('save', async function (next) {
-    if (this.courseId && !this.courseSlug) {
+    if (this.courseId && !this.slug) {
         const Course = mongoose.model('courses');
         const course = await Course.findById(this.courseId).select('slug');
         if (course) {
-            this.courseSlug = course.slug;
+            this.slug = course.slug;
         }
     }
     next();
@@ -42,7 +42,7 @@ LessonSchema.pre('findOneAndUpdate', async function (next) {
         const Course = mongoose.model('courses');
         const course = await Course.findById(update.courseId).select('slug');
         if (course) {
-            update.courseSlug = course.slug;
+            update.slug = course.slug;
             this.setUpdate(update);
         }
     }

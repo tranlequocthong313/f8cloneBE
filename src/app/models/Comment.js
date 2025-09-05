@@ -25,11 +25,38 @@ const CommentSchema = new Schema(
             required: true,
         },
         entity: { type: ObjectId, required: true, refPath: 'entityModel' },
+        slug: { type: String, required: false },
     },
     {
         timestamps: true,
     }
 );
+
+// Auto-set slug before saving
+CommentSchema.pre('save', async function (next) {
+    if (this.entity && !this.slug) {
+        const Entity = mongoose.model(this.entityModel);
+        const entity = await Entity.findById(this.entity).select('slug');
+        if (entity) {
+            this.slug = entity.slug;
+        }
+    }
+    next();
+});
+
+// Also update slug if entity changes
+CommentSchema.pre('findOneAndUpdate', async function (next) {
+    const update = this.getUpdate();
+    if (update.entity) {
+        const Entity = mongoose.model(this.entityModel);
+        const entity = await Entity.findById(update.entity).select('slug');
+        if (entity) {
+            update.slug = entity.slug;
+            this.setUpdate(update);
+        }
+    }
+    next();
+});
 
 CommentSchema.index({ entity: 1, entityModel: 1 });
 CommentSchema.index({ parentComment: 1 });
