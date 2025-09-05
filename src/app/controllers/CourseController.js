@@ -10,12 +10,14 @@ class CourseController {
         try {
             const course = await Course.findOne({
                 slug: req.params.slug,
-            }).populate({
-                path: 'episodes',
-                populate: {
-                    path: 'lessons',
-                },
-            });
+            })
+                .populate({
+                    path: 'episodes',
+                    populate: {
+                        path: 'lessons',
+                    },
+                })
+                .lean();
             return res.json(course);
         } catch (error) {
             console.log(error);
@@ -32,12 +34,12 @@ class CourseController {
     async getCourseByRole(req, res) {
         try {
             const data = await Promise.all([
-                Course.find({ role: { $in: ['FE', 'Fullstack'] } }).select(
-                    'id slug image title studentCount'
-                ),
-                Course.find({ role: { $in: ['FE', 'Fullstack'] } }).select(
-                    'id slug image title studentCount'
-                ),
+                Course.find({ role: { $in: ['FE', 'Fullstack'] } })
+                    .select('id slug image title studentCount')
+                    .lean(),
+                Course.find({ role: { $in: ['FE', 'Fullstack'] } })
+                    .select('id slug image title studentCount')
+                    .lean(),
             ]);
 
             return res.json({
@@ -130,7 +132,7 @@ class CourseController {
             const progress = await LearnProgress.findOne({
                 courseId: req.params.id,
                 userId: req._id,
-            });
+            }).lean();
 
             return res.json({
                 progress,

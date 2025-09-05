@@ -36,7 +36,7 @@ const CommentSchema = new Schema(
 CommentSchema.pre('save', async function (next) {
     if (this.entity && !this.slug) {
         const Entity = mongoose.model(this.entityModel);
-        const entity = await Entity.findById(this.entity).select('slug');
+        const entity = await Entity.findById(this.entity).select('slug').lean();
         if (entity) {
             this.slug = entity.slug;
         }
@@ -49,7 +49,9 @@ CommentSchema.pre('findOneAndUpdate', async function (next) {
     const update = this.getUpdate();
     if (update.entity) {
         const Entity = mongoose.model(this.entityModel);
-        const entity = await Entity.findById(update.entity).select('slug');
+        const entity = await Entity.findById(update.entity)
+            .select('slug')
+            .lean();
         if (entity) {
             update.slug = entity.slug;
             this.setUpdate(update);

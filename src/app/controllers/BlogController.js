@@ -55,7 +55,8 @@ class BlogController {
                 isPosted: true,
             })
                 .populate('postedBy')
-                .sort({ createdAt: -1 });
+                .sort({ createdAt: -1 })
+                .lean();
 
             return res.json(allBlog);
         } catch (error) {
@@ -78,7 +79,8 @@ class BlogController {
                 postedBy: req._id,
             })
                 .populate('postedBy')
-                .sort({ createdAt: -1 });
+                .sort({ createdAt: -1 })
+                .lean();
 
             return res.json(allBlog);
         } catch (error) {
@@ -169,10 +171,9 @@ class BlogController {
                         },
                     },
                 ]),
-                Blog.find({ isPopular: true, isPosted: true }).populate(
-                    'postedBy',
-                    '_id fullName bio photoURL'
-                ),
+                Blog.find({ isPopular: true, isPosted: true })
+                    .populate('postedBy', '_id fullName bio photoURL')
+                    .lean(),
             ]);
 
             return res.json({
@@ -200,7 +201,8 @@ class BlogController {
                 tags: req.params.tag,
             })
                 .populate('postedBy')
-                .sort({ createdAt: -1 });
+                .sort({ createdAt: -1 })
+                .lean();
 
             return res.json(blogTagData);
         } catch (error) {
@@ -246,7 +248,9 @@ class BlogController {
                 _id: { $ne: req.params.blogId },
                 schedule: null,
                 isPosted: true,
-            }).select('slug titleDisplay');
+            })
+                .select('slug titleDisplay')
+                .lean();
 
             return res.json(blogSameAuthor);
         } catch (error) {
@@ -263,9 +267,9 @@ class BlogController {
     // @access Private
     async like(req, res) {
         try {
-            const blog = await Blog.findById(req.body.blogId).select(
-                'likes postedBy'
-            );
+            const blog = await Blog.findById(req.body.blogId)
+                .select('likes postedBy')
+                .lean();
 
             const isLikedBlog = blog.likes.includes(req._id);
             if (isLikedBlog) {
@@ -275,7 +279,9 @@ class BlogController {
                         $pull: { likes: req._id },
                     },
                     { new: true }
-                ).select('likes slug postedBy');
+                )
+                    .select('likes slug postedBy')
+                    .lean();
 
                 req.io.emit('like_blog', likes);
 
@@ -287,7 +293,9 @@ class BlogController {
                     $push: { likes: { $each: [req._id], $position: 0 } },
                 },
                 { new: true }
-            ).select('likes slug postedBy');
+            )
+                .select('likes slug postedBy')
+                .lean();
 
             if (req._id !== blog.postedBy.toString()) {
                 let notification = await Notification.findOne({
@@ -335,7 +343,9 @@ class BlogController {
                 {
                     $set: { isPopular: !req.body.isPopular },
                 }
-            ).sort({ createdAt: -1 });
+            )
+                .sort({ createdAt: -1 })
+                .lean();
 
             return res.json({
                 success: true,

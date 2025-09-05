@@ -137,7 +137,7 @@ class AdminController {
     async deleteBlogSoft(req, res) {
         try {
             await Blog.delete({ _id: { $in: req.body.blogId } });
-            const blog = await Blog.find().sort({ createdAt: -1 });
+            const blog = await Blog.find().sort({ createdAt: -1 }).lean();
 
             return res.json({
                 success: true,
@@ -163,7 +163,7 @@ class AdminController {
                 {
                     $set: { isPopular: !req.body.isPopular },
                 }
-            ).sort({ createdAt: -1 });
+            ).sort({ createdAt: -1 }).lean();
 
             return res.json({
                 success: true,
@@ -205,7 +205,7 @@ class AdminController {
     async deleteVideoSoft(req, res) {
         try {
             await Video.delete({ _id: { $in: req.body.videoId } });
-            const video = await Video.find().sort({ createdAt: -1 });
+            const video = await Video.find().sort({ createdAt: -1 }).lean();
 
             return res.json({
                 success: true,
@@ -231,7 +231,7 @@ class AdminController {
                 {
                     $set: { isPopular: !req.body.isPopular },
                 }
-            ).sort({ createdAt: -1 });
+            ).sort({ createdAt: -1 }).lean();
 
             return res.json({
                 success: true,
@@ -253,11 +253,11 @@ class AdminController {
     async getData(req, res) {
         try {
             const data = await Promise.all([
-                Course.find(),
+                Course.find().lean(),
                 Blog.find({ schedule: null, isPosted: true }).populate(
                     'postedBy'
-                ),
-                Video.find().sort({ createdAt: -1 }),
+                ).lean(),
+                Video.find().sort({ createdAt: -1 }).lean(),
             ]);
 
             return res.json({

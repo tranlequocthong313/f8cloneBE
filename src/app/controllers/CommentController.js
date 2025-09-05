@@ -102,7 +102,9 @@ class CommentController {
 
             const comments = await Comment.find({
                 parentComment: id,
-            }).populate('postedBy');
+            })
+                .populate('postedBy')
+                .lean();
 
             return res.json({
                 success: true,
@@ -145,9 +147,9 @@ class CommentController {
             const { repliedCommentId, parentComment } = req.body;
             let repliedComment;
             if (repliedCommentId) {
-                repliedComment = await Comment.findById(
-                    repliedCommentId
-                ).populate('postedBy');
+                repliedComment = await Comment.findById(repliedCommentId)
+                    .populate('postedBy')
+                    .lean();
             }
 
             req.io.emit('post-comment', comment);
@@ -231,7 +233,9 @@ class CommentController {
                 {
                     new: true,
                 }
-            ).populate('postedBy');
+            )
+                .populate('postedBy')
+                .lean();
 
             if (!comment) {
                 return res.status(404).json({
@@ -264,7 +268,7 @@ class CommentController {
             const comment = await Comment.findOne({
                 _id: req.params.id,
                 postedBy: req._id,
-            });
+            }).lean();
             const result = await Comment.deleteOne({
                 _id: req.params.id,
                 postedBy: req._id,

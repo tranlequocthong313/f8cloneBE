@@ -27,7 +27,9 @@ LessonSchema.virtual('course', {
 LessonSchema.pre('save', async function (next) {
     if (this.courseId && !this.slug) {
         const Course = mongoose.model('courses');
-        const course = await Course.findById(this.courseId).select('slug');
+        const course = await Course.findById(this.courseId)
+            .select('slug')
+            .lean();
         if (course) {
             this.slug = course.slug;
         }
@@ -40,7 +42,9 @@ LessonSchema.pre('findOneAndUpdate', async function (next) {
     const update = this.getUpdate();
     if (update.courseId) {
         const Course = mongoose.model('courses');
-        const course = await Course.findById(update.courseId).select('slug');
+        const course = await Course.findById(update.courseId)
+            .select('slug')
+            .lean();
         if (course) {
             update.slug = course.slug;
             this.setUpdate(update);

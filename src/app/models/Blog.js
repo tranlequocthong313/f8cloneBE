@@ -52,7 +52,27 @@ BlogSchema.plugin(mongooseDelete, {
     deletedAt: true,
 });
 
-BlogSchema.index({ tags: 1 });
-BlogSchema.index({ postedBy: 1 });
+BlogSchema.index({ slug: 1 }, { unique: true });
+BlogSchema.index({ isPopular: 1, isPosted: 1 });
+BlogSchema.index({ schedule: 1, isVerified: 1, isPosted: 1, createdAt: -1 });
+BlogSchema.index({
+    postedBy: 1,
+    isPosted: 1,
+    schedule: 1,
+    createdAt: -1,
+});
+BlogSchema.index({
+    tags: 1,
+    isVerified: 1,
+    isPosted: 1,
+    schedule: 1,
+    createdAt: -1,
+});
+BlogSchema.index({
+    postedBy: 1,
+    isPosted: 1,
+    schedule: 1,
+    createdAt: -1,
+});
 
 module.exports = mongoose.model('blogs', BlogSchema);

@@ -13,9 +13,7 @@ class UserController {
     // @access Public
     async getUser(req, res) {
         try {
-            let user = await User.findById({ _id: req._id });
-
-            console.log(user);
+            let user = await User.findById({ _id: req._id }).lean();
 
             return !user
                 ? res.json({ success: false, message: 'User not found' })
@@ -43,7 +41,7 @@ class UserController {
                     ),
                     $options: 'i',
                 },
-            });
+            }).lean();
 
             let slugExistIndex = '';
             const isExistUserSlug = slugExist && slugExist.length > 0;
@@ -100,7 +98,7 @@ class UserController {
     // @access Public
     async login(req, res) {
         try {
-            let user = await User.findOne({ email: req.body.email });
+            let user = await User.findOne({ email: req.body.email }).lean();
 
             if (!user)
                 return res.json({
@@ -159,7 +157,7 @@ class UserController {
                 try {
                     const user = await User.findOne({
                         phoneNumber: req.body.phoneNumber,
-                    });
+                    }).lean();
 
                     const accessToken = jwt.sign(
                         { _id: user._id },
@@ -183,7 +181,7 @@ class UserController {
             // Login with fb, google, github
             const userCreated = await User.findOne({
                 email: req.body.email,
-            });
+            }).lean();
 
             if (userCreated) {
                 const accessToken = jwt.sign(
@@ -213,7 +211,7 @@ class UserController {
                     $regex: normalizedBase,
                     $options: 'i',
                 },
-            });
+            }).lean();
 
             let slugExistIndex = '';
             if (slugExist && slugExist.length > 0) {
@@ -284,7 +282,9 @@ class UserController {
     // @access Public
     async checkEmail(req, res) {
         try {
-            const emailExist = await User.findOne({ email: req.body.email });
+            const emailExist = await User.findOne({
+                email: req.body.email,
+            }).lean();
 
             return !emailExist
                 ? res.json({
@@ -305,7 +305,7 @@ class UserController {
         try {
             const phoneExist = await User.findOne({
                 phoneNumber: req.body.phoneNumber,
-            });
+            }).lean();
 
             return !phoneExist
                 ? res.json({
@@ -333,7 +333,7 @@ class UserController {
             await User.findOneAndUpdate(
                 { email: req.body.email },
                 { password: hashPassword }
-            );
+            ).lean();
 
             return res.json({
                 success: true,
@@ -353,7 +353,9 @@ class UserController {
     // @access Private
     async bookmark(req, res) {
         try {
-            const bookmarked = await User.findById(req._id).select('bookmark');
+            const bookmarked = await User.findById(req._id)
+                .select('bookmark')
+                .lean();
 
             const isBookmarkedBlog = bookmarked.bookmark.includes(
                 req.body.blogId
@@ -366,7 +368,9 @@ class UserController {
                         $pull: { bookmark: req.body.blogId },
                     },
                     { new: true }
-                ).select('bookmark');
+                )
+                    .select('bookmark')
+                    .lean();
 
                 return res.json(bookmark);
             }
@@ -378,7 +382,9 @@ class UserController {
                     },
                 },
                 { new: true }
-            ).select('bookmark');
+            )
+                .select('bookmark')
+                .lean();
 
             return res.json(bookmark);
         } catch (error) {
@@ -391,7 +397,9 @@ class UserController {
     // @access Private
     async getBookmark(req, res) {
         try {
-            const bookmark = await User.findById(req._id).select('bookmark');
+            const bookmark = await User.findById(req._id)
+                .select('bookmark')
+                .lean();
 
             return res.json(bookmark);
         } catch (error) {
@@ -404,13 +412,16 @@ class UserController {
     // @access Private
     async getBookmarkAndBlogAuthor(req, res) {
         try {
-            const blogId = await User.findById(req._id).select('bookmark');
+            const blogId = await User.findById(req._id)
+                .select('bookmark')
+                .lean();
 
             const bookmark = await Blog.find({
                 _id: { $in: blogId.bookmark },
             })
                 .select('_id titleDisplay slug createdAt')
-                .populate('postedBy', '_id fullName');
+                .populate('postedBy', '_id fullName')
+                .lean();
 
             return res.json(bookmark);
         } catch (error) {
@@ -428,10 +439,12 @@ class UserController {
 
             const user = await User.findOne({
                 slug: req.params.slug,
-            }).populate({
-                path: 'coursesEnrolled',
-                select: '-episode -requirement -topics -comments',
-            });
+            })
+                .populate({
+                    path: 'coursesEnrolled',
+                    select: '-episode -requirement -topics -comments',
+                })
+                .lean();
 
             console.log('USER BY SLUG: ', user);
 
@@ -446,7 +459,7 @@ class UserController {
     // @access Private
     async getUserEnrolledCourse(req, res) {
         try {
-            const user = await User.findById(req._id);
+            const user = await User.findById(req._id).lean();
             if (!user) {
                 return res.status(404).json({
                     message: 'User not found',
@@ -456,7 +469,9 @@ class UserController {
 
             const courses = await Course.find({
                 _id: { $in: user?.coursesEnrolled },
-            }).select('-episode -requirement -topics -comments');
+            })
+                .select('-episode -requirement -topics -comments')
+                .lean();
 
             return res.json({
                 message: 'Get enrolled courses successfully!',

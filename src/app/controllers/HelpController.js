@@ -17,7 +17,9 @@ class HelpController {
                     $set: { fullName: req.body.fullName },
                 },
                 { new: true }
-            ).select('fullName');
+            )
+                .select('fullName')
+                .lean();
 
             return res.json(fullName);
         } catch (error) {
@@ -36,7 +38,9 @@ class HelpController {
                     $set: { photoURL: req.body.photoURL },
                 },
                 { new: true }
-            ).select('photoURL');
+            )
+                .select('photoURL')
+                .lean();
 
             return res.json(avatar);
         } catch (error) {
@@ -55,7 +59,9 @@ class HelpController {
                     $set: { bio: req.body.bio },
                 },
                 { new: true }
-            ).select('bio');
+            )
+                .select('bio')
+                .lean();
 
             return res.json(bio);
         } catch (error) {
@@ -71,7 +77,9 @@ class HelpController {
             const linkedin = req.body.linkedin;
             const twitter = req.body.twitter;
 
-            const social = await User.findById(req._id).select('socials');
+            const social = await User.findById(req._id)
+                .select('socials')
+                .lean();
 
             const socials = await User.findOneAndUpdate(
                 { _id: req._id },
@@ -87,7 +95,9 @@ class HelpController {
                     },
                 },
                 { new: true }
-            ).select('socials');
+            )
+                .select('socials')
+                .lean();
 
             console.log(socials);
 
@@ -105,7 +115,9 @@ class HelpController {
             const myBlog = await Blog.find({
                 postedBy: req._id,
                 isPosted: true,
-            }).sort({ createdAt: -1 });
+            })
+                .sort({ createdAt: -1 })
+                .lean();
 
             return res.json(myBlog);
         } catch (error) {
@@ -143,7 +155,7 @@ class HelpController {
     // @access Public
     async getJob(req, res) {
         try {
-            const jobs = await Job.find();
+            const jobs = await Job.find().lean();
 
             return res.json(jobs);
         } catch (error) {
@@ -185,7 +197,9 @@ class HelpController {
                             },
                         },
                     ],
-                }).select('_id slug image title description'),
+                })
+                    .select('_id slug image title description')
+                    .lean(),
                 Blog.find({
                     $or: [
                         {
@@ -215,7 +229,8 @@ class HelpController {
                     ],
                 })
                     .select('_id slug titleDisplay image likes comments')
-                    .populate('postedBy', 'photoURL'),
+                    .populate('postedBy', 'photoURL')
+                    .lean(),
                 Video.find({
                     $or: [
                         {
@@ -235,7 +250,9 @@ class HelpController {
                             },
                         },
                     ],
-                }).select('_id videoId title image'),
+                })
+                    .select('_id videoId title image')
+                    .lean(),
             ]);
 
             return res.json({

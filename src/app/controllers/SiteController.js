@@ -10,28 +10,26 @@ class SiteController {
     async index(req, res) {
         try {
             const data = await Promise.all([
-                Course.find({ role: { $in: ['FE', 'Fullstack'] } }).select(
-                    '_id slug image title studentCount'
-                ),
-
-                Course.find({ role: { $in: ['BE', 'Fullstack'] } }).select(
-                    '_id slug image title studentCount'
-                ),
+                Course.find({})
+                    .select('_id slug image title studentCount role')
+                    .lean(),
                 Blog.find({ schedule: null, isPopular: true, isVerified: true })
                     .populate('postedBy')
                     .select(
                         '_id slug title titleDisplay image avatar author readingTime'
-                    ),
+                    )
+                    .lean(),
                 Video.find({
                     isPopular: true,
-                }).sort({ createdAt: -1 }),
+                })
+                    .sort({ createdAt: -1 })
+                    .lean(),
             ]);
 
             return res.json({
-                courseFE: data[0],
-                courseBE: data[1],
-                blogs: data[2],
-                videos: data[3],
+                courses: data[0],
+                blogs: data[1],
+                videos: data[2],
             });
         } catch (error) {
             console.log(error);
