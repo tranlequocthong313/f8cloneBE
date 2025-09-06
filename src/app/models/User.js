@@ -11,7 +11,7 @@ const UserSchema = new Schema(
         phoneNumber: { type: String, sparse: true, unique: true },
         photoURL: String,
         bookmark: [{ type: ObjectId, ref: 'blogs' }],
-        activated: { type: Boolean, required: true },
+        activated: { type: Boolean, required: true, default: true },
         isAdmin: Boolean,
         provider: String,
         socials: {

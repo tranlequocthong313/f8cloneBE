@@ -1,5 +1,6 @@
 const Course = require('../models/Course');
-const LearnProgress = require('../models/LearnProgress');
+const LearningProgress = require('../models/LearningProgress');
+const Lesson = require('../models/Lesson');
 const User = require('../models/User');
 
 class CourseController {
@@ -102,13 +103,13 @@ class CourseController {
                 startedAt: index === 0 ? new Date() : null,
             }));
 
-            const learnProgress = new LearnProgress({
+            const learningProgress = new LearningProgress({
                 userId: user._id,
                 courseId: course._id,
                 lessons: lessonProgress,
             });
 
-            await learnProgress.save();
+            await learningProgress.save();
 
             return res.json({
                 success: true,
@@ -129,7 +130,7 @@ class CourseController {
     // @access Private
     async getLearningProgress(req, res) {
         try {
-            const progress = await LearnProgress.findOne({
+            const progress = await LearningProgress.findOne({
                 courseId: req.params.id,
                 userId: req._id,
             }).lean();
@@ -158,7 +159,7 @@ class CourseController {
         try {
             const { lessonId } = req.body;
 
-            const progress = await LearnProgress.findOne({
+            const progress = await LearningProgress.findOne({
                 courseId: req.params.id,
                 userId: req._id,
             });
@@ -210,6 +211,20 @@ class CourseController {
             });
         }
     }
+
+    // async getLessons(req, res) {
+    //     return res.json(await Lesson.find({}));
+    // }
+
+    // async updateLesson(req, res) {
+    //     return res.json(
+    //         await Lesson.findOneAndUpdate(
+    //             { _id: req.params.id },
+    //             { $set: req.body },
+    //             { new: true }
+    //         ).lean()
+    //     );
+    // }
 }
 
 module.exports = new CourseController();

@@ -18,7 +18,8 @@ class SiteController {
                     .select(
                         '_id slug title titleDisplay image avatar author readingTime'
                     )
-                    .lean(),
+                    .lean()
+                    .sort({ createdAt: -1 }),
                 Video.find({
                     isPopular: true,
                 })

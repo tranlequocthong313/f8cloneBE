@@ -173,6 +173,7 @@ class BlogController {
                 ]),
                 Blog.find({ isPopular: true, isPosted: true })
                     .populate('postedBy', '_id fullName bio photoURL')
+                    .sort({ createdAt: -1 })
                     .lean(),
             ]);
 

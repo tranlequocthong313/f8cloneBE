@@ -21,7 +21,7 @@ class CommentController {
             const comments = await Comment.aggregate([
                 {
                     $match: {
-                        entity: new ObjectId(entityId),
+                        entity: ObjectId(entityId),
                         entityModel: type,
                         parentComment: null,
                     },
@@ -144,7 +144,7 @@ class CommentController {
                 });
             }
 
-            const { repliedCommentId, parentComment } = req.body;
+            const { repliedCommentId } = req.body;
             let repliedComment;
             if (repliedCommentId) {
                 repliedComment = await Comment.findById(repliedCommentId)

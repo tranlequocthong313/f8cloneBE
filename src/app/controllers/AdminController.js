@@ -22,6 +22,7 @@ class AdminController {
                 topics,
                 requirement,
                 episodes,
+                role,
             } = req.body;
 
             const course = await Course.create(
@@ -36,6 +37,7 @@ class AdminController {
                         requirement,
                         search: title?.toLowerCase(),
                         postedBy: req._id,
+                        role,
                     },
                 ],
                 { session }
@@ -163,7 +165,9 @@ class AdminController {
                 {
                     $set: { isPopular: !req.body.isPopular },
                 }
-            ).sort({ createdAt: -1 }).lean();
+            )
+                .sort({ createdAt: -1 })
+                .lean();
 
             return res.json({
                 success: true,
@@ -231,7 +235,9 @@ class AdminController {
                 {
                     $set: { isPopular: !req.body.isPopular },
                 }
-            ).sort({ createdAt: -1 }).lean();
+            )
+                .sort({ createdAt: -1 })
+                .lean();
 
             return res.json({
                 success: true,
@@ -254,9 +260,9 @@ class AdminController {
         try {
             const data = await Promise.all([
                 Course.find().lean(),
-                Blog.find({ schedule: null, isPosted: true }).populate(
-                    'postedBy'
-                ).lean(),
+                Blog.find({ schedule: null, isPosted: true })
+                    .populate('postedBy')
+                    .lean(),
                 Video.find().sort({ createdAt: -1 }).lean(),
             ]);
 

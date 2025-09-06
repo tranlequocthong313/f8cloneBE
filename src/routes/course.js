@@ -1,16 +1,18 @@
 const express = require('express');
 const router = express.Router();
-const courseController = require('../app/controllers/CourseController');
+const CourseController = require('../app/controllers/CourseController');
 const verifyToken = require('../middleware/verifyToken');
 
-router.get('/:id/progress', verifyToken, courseController.getLearningProgress);
+// router.get('/lessons', CourseController.getLessons)
+// router.put('/lessons/:id', CourseController.updateLesson)
+router.get('/:id/progress', verifyToken, CourseController.getLearningProgress);
 router.put(
     '/:id/progress',
     verifyToken,
-    courseController.updateLearningProgress
+    CourseController.updateLearningProgress
 );
-router.put('/:id/enroll', verifyToken, courseController.enrollCourse);
-router.get('/:slug', courseController.getCourse);
+router.put('/:id/enroll', verifyToken, CourseController.enrollCourse);
+router.get('/:slug', CourseController.getCourse);
 // router.get('/', courseController.getCourseByRole);
 
 module.exports = router;

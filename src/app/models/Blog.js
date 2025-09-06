@@ -52,7 +52,7 @@ BlogSchema.plugin(mongooseDelete, {
     deletedAt: true,
 });
 
-BlogSchema.index({ isPopular: 1, isPosted: 1 });
+BlogSchema.index({ isPopular: 1, isPosted: 1, createdAt: -1 });
 BlogSchema.index({ schedule: 1, isPopular: 1, isVerified: 1 });
 BlogSchema.index({ schedule: 1, isVerified: 1, isPosted: 1, createdAt: -1 });
 BlogSchema.index({

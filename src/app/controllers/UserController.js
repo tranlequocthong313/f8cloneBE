@@ -59,7 +59,7 @@ class UserController {
                 password: hashPassword,
                 phoneNumber: req.body.phoneNumber,
                 photoURL: req.body.photoURL,
-                activated: req.body.activated,
+                activated: req.body?.activated || true,
                 slug: `@${removeAccents(
                     String(req.body.fullName + slugExistIndex)
                         .toLowerCase()

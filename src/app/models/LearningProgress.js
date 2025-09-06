@@ -13,15 +13,15 @@ const userLessonProgressSchema = new Schema({
     completedAt: Date,
 });
 
-const LearnProgressSchema = new Schema({
+const LearningProgressSchema = new Schema({
     userId: { type: ObjectId, ref: 'users' },
     courseId: { type: ObjectId, ref: 'courses' },
     lessons: [userLessonProgressSchema],
 });
 
-LearnProgressSchema.index({
+LearningProgressSchema.index({
     userId: 1,
     courseId: 1,
 });
 
-module.exports = mongoose.model('learn_progress', LearnProgressSchema);
+module.exports = mongoose.model('learning_progress', LearningProgressSchema);
