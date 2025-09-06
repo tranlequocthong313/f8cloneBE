@@ -14,6 +14,27 @@ const LearningNote = new Schema(
     }
 );
 
+LearningNote.virtual('course', {
+    ref: 'courses',
+    localField: 'courseId',
+    foreignField: '_id',
+    justOne: true,
+});
+
+LearningNote.virtual('episode', {
+    ref: 'episodes',
+    localField: 'episodeId',
+    foreignField: '_id',
+    justOne: true,
+});
+
+LearningNote.virtual('lesson', {
+    ref: 'lessons',
+    localField: 'lessonId',
+    foreignField: '_id',
+    justOne: true,
+});
+
 LearningNote.index({
     courseId: 1,
     episodeId: 1,

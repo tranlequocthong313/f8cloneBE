@@ -9,7 +9,7 @@ class LearningNoteController {
     // @access Private
     async getNotes(req, res) {
         try {
-            const { courseId, episodeId, sort = -1 } = req.query;
+            const { courseId, episodeId = null, sort = -1 } = req.query;
 
             if (!courseId) {
                 return res.status(400).json({
@@ -18,11 +18,22 @@ class LearningNoteController {
                 });
             }
 
-            const notes = await LearningNote.find({
-                courseId,
-                episodeId,
-            })
-                .populate(['courseId', 'episodeId', 'lessonId'])
+            const filter = { courseId };
+            if (episodeId) {
+                filter.episodeId = episodeId;
+            }
+
+            const notes = await LearningNote.find(filter)
+                .populate([
+                    {
+                        path: 'episode',
+                        select: 'title',
+                    },
+                    {
+                        path: 'lesson',
+                        select: 'title',
+                    },
+                ])
                 .sort({ createdAt: isNaN(sort) ? -1 : sort })
                 .lean();
 
