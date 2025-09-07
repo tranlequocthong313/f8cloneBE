@@ -105,6 +105,7 @@ class LearningNoteController {
         try {
             const { id } = req.params;
             const { content } = req.body;
+            console.log("🚀 ~ LearningNoteController ~ editNote ~ id:", id, content)
 
             if (!content || !id) {
                 return res.status(400).json({
