@@ -4,6 +4,7 @@ const UserController = require('../app/controllers/UserController')
 const verifyToken = require('../middleware/verifyToken')
 
 router.get('/enrolled-courses', verifyToken, UserController.getUserEnrolledCourse)
+router.put('/completed-tutorial', verifyToken, UserController.completeTutorial)
 router.put('/bookmark', verifyToken, UserController.bookmark)
 router.get('/bookmark', verifyToken, UserController.getBookmark)
 router.get(

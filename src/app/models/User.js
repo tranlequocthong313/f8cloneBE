@@ -24,6 +24,7 @@ const UserSchema = new Schema(
 
         bio: String,
         coursesEnrolled: [{ type: ObjectId, ref: 'courses' }],
+        completedTutorial: { type: Boolean, default: false },
         // activities:
     },
     {

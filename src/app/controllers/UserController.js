@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const MailHtml = require('../../utils/MailHTML');
 const removeAccents = require('vn-remove-accents');
 const Course = require('../models/Course');
+const LearningProgress = require('../models/LearningProgress');
 
 class UserController {
     // @route GET api/auth
@@ -455,7 +456,7 @@ class UserController {
     }
 
     // @route GET /me/enrolled-courses
-    // @desc Get user's enrolled courses
+    // @desc Get user's enrolled courses with progress
     // @access Private
     async getUserEnrolledCourse(req, res) {
         try {
@@ -470,17 +471,85 @@ class UserController {
             const courses = await Course.find({
                 _id: { $in: user?.coursesEnrolled },
             })
-                .select('-episode -requirement -topics -comments')
+                .select('-requirement -topics')
+                .populate({
+                    path: 'episodes',
+                    select: 'title lessons',
+                })
                 .lean();
+
+            const results = await Promise.all(
+                courses.map(async (course) => {
+                    const totalLessons = course.episodes?.reduce(
+                        (acc, ep) => acc + (ep.lessons?.length || 0),
+                        0
+                    );
+
+                    const progress = await LearningProgress.findOne({
+                        userId: req._id,
+                        courseId: course._id,
+                    }).lean();
+
+                    const completedLessons =
+                        progress?.lessons.filter(
+                            (l) => l.status === 'completed'
+                        ) || [];
+
+                    const totalCompletedLessons = completedLessons.length || 0;
+
+                    const lastCompletedLesson =
+                        completedLessons[completedLessons.length - 1];
+
+                    const percentage =
+                        totalLessons > 0
+                            ? Math.round(
+                                  (totalCompletedLessons / totalLessons) * 100
+                              )
+                            : 0;
+
+                    return {
+                        ...course,
+                        totalLessons,
+                        completedLessons: totalCompletedLessons,
+                        progress: percentage,
+                        lastLearnedAt: lastCompletedLesson?.completedAt || null,
+                    };
+                })
+            );
 
             return res.json({
                 message: 'Get enrolled courses successfully!',
                 success: true,
-                courses,
+                courses: results,
             });
         } catch (error) {
             console.log(
                 '🚀 ~ UserController ~ getUserEnrolledCourse ~ error:',
+                error
+            );
+            return res.status(500).json({
+                message: 'Internal server error',
+                success: false,
+            });
+        }
+    }
+
+    // @route PUT /me/completed-tutorial
+    // @desc Set complete tutorial
+    // @access Private
+    async completeTutorial(req, res) {
+        try {
+            await User.updateOne(
+                { _id: req._id },
+                { $set: { completedTutorial: true } }
+            );
+            return res.json({
+                message: 'Completed tutorial',
+                success: true,
+            });
+        } catch (error) {
+            console.log(
+                '🚀 ~ UserController ~ completeTutorial ~ error:',
                 error
             );
             return res.status(500).json({
