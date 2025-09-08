@@ -12,6 +12,14 @@ class SiteController {
             const data = await Promise.all([
                 Course.find({})
                     .select('_id slug image title studentCount role')
+                    .populate({
+                        path: 'episodes',
+                        select: 'lessons',
+                        populate: {
+                            path: 'lessons',
+                            select: 'time',
+                        },
+                    })
                     .lean(),
                 Blog.find({ schedule: null, isPopular: true, isVerified: true })
                     .populate('postedBy')

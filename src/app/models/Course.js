@@ -32,6 +32,7 @@ const CourseSchema = new Schema(
         episodes: [{ type: ObjectId, ref: 'episodes' }],
         role: String,
         postedBy: { type: ObjectId, ref: 'users' },
+        icon: { type: String },
     },
     {
         timestamps: true,
