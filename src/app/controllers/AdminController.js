@@ -134,7 +134,7 @@ class AdminController {
     }
 
     // @route POST /blog/delete-soft
-    // @desc Delete soft blog by youtube blogId
+    // @desc Delete soft blog by blogId
     // @access Private
     async deleteBlogSoft(req, res) {
         try {

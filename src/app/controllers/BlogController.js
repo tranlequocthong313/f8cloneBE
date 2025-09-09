@@ -44,23 +44,31 @@ class BlogController {
         }
     }
 
-    // @route GET /blog
+    // @route GET /blog?topic=xxx?tag=yyy
     // @desc Get all blog
     // @access Public
     async getAllBlog(req, res) {
+        const { topic, tag } = req.query;
         try {
-            const allBlog = await Blog.find({
+            const filter = {
                 schedule: null,
                 isVerified: true,
                 isPosted: true,
-            })
+            };
+            if (topic) {
+                filter.topic = topic;
+            }
+            if (tag) {
+                filter.tags = { $ne: null, $in: [tag] };
+            }
+            const allBlog = await Blog.find(filter)
                 .populate('postedBy')
                 .sort({ createdAt: -1 })
                 .lean();
 
             return res.json(allBlog);
         } catch (error) {
-            console.log(error);
+            console.log('error', error);
             return res.json({
                 success: false,
                 message: 'Get blog failed!',
@@ -182,7 +190,7 @@ class BlogController {
                 blogHighlight: blogData[1],
             });
         } catch (error) {
-            console.log(error);
+            console.log('eerroror', error);
             return res.json({
                 success: false,
                 message: 'Get blog failed!',
@@ -255,10 +263,34 @@ class BlogController {
 
             return res.json(blogSameAuthor);
         } catch (error) {
-            console.log(error);
+            console.log('author error', error);
             return res.json({
                 success: false,
                 message: 'Get blog failed!',
+            });
+        }
+    }
+
+    // @route GET /blog/:id
+    // @desc Delete blog same author
+    // @access Private
+    async deleteBlog(req, res) {
+        try {
+            const result = await Blog.deleteOne({
+                postedBy: req._id,
+                _id: req.params.id,
+            });
+
+            return res.json({
+                success: true,
+                message: 'Deleted successfully',
+                result,
+            });
+        } catch (error) {
+            console.log("🚀 ~ BlogController ~ deleteBlog ~ error:", error)
+            return res.json({
+                success: false,
+                message: 'Delete blog failed!',
             });
         }
     }

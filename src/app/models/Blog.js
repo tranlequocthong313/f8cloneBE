@@ -3,6 +3,7 @@ const { ObjectId } = mongoose.Schema.Types;
 const Schema = mongoose.Schema;
 const slug = require('mongoose-slug-generator');
 const mongooseDelete = require('mongoose-delete');
+const { TOPICS } = require('../../utils/constants');
 
 mongoose.plugin(slug);
 
@@ -22,6 +23,16 @@ const BlogSchema = new Schema(
                     return !v || v?.length <= 5;
                 },
             },
+        },
+        topic: {
+            type: String,
+            enum: [
+                'front-end-mobile-apps',
+                'back-end-devops',
+                'ui-ux-design',
+                'others',
+            ],
+            index: true,
         },
         likes: [{ type: ObjectId, ref: 'users' }],
         slug: {
@@ -63,6 +74,7 @@ BlogSchema.index({
 });
 BlogSchema.index({
     tags: 1,
+    topic: 1,
     isVerified: 1,
     isPosted: 1,
     schedule: 1,
@@ -73,6 +85,22 @@ BlogSchema.index({
     isPosted: 1,
     schedule: 1,
     createdAt: -1,
+});
+
+function detectTopic(tags) {
+    for (const [topic, keywords] of Object.entries(TOPICS)) {
+        if (tags?.some((tag) => keywords.includes(tag.toLowerCase()))) {
+            return topic;
+        }
+    }
+    return 'others';
+}
+
+BlogSchema.pre('save', function (next) {
+    if (!this.topic) {
+        this.topic = detectTopic(this.tags || []);
+    }
+    next();
 });
 
 module.exports = mongoose.model('blogs', BlogSchema);
