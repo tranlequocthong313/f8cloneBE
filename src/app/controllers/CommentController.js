@@ -135,15 +135,6 @@ class CommentController {
             await comment.save();
             await comment.populate(['entity', 'postedBy', 'parentComment']);
 
-            if (comment.entityModel === 'lessons') {
-                await comment.populate({
-                    path: 'entity',
-                    populate: {
-                        path: 'course',
-                    },
-                });
-            }
-
             const { repliedCommentId } = req.body;
             let repliedComment;
             if (repliedCommentId) {
@@ -159,9 +150,7 @@ class CommentController {
             );
 
             let receiver;
-            if (comment.entityModel === 'lessons') {
-                receiver = comment.entity.course.postedBy.toString();
-            } else if (comment.entityModel === 'blogs') {
+            if (comment.entityModel === 'blogs') {
                 receiver = comment.entity.postedBy.toString();
             }
 

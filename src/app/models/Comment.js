@@ -34,27 +34,12 @@ const CommentSchema = new Schema(
 
 // Auto-set slug before saving
 CommentSchema.pre('save', async function (next) {
+    console.log('this.entity', this.entity)
     if (this.entity && !this.slug) {
         const Entity = mongoose.model(this.entityModel);
-        const entity = await Entity.findById(this.entity).select('slug').lean();
+        const entity = await Entity.findById(this.entity._id).select('slug').lean()
         if (entity) {
             this.slug = entity.slug;
-        }
-    }
-    next();
-});
-
-// Also update slug if entity changes
-CommentSchema.pre('findOneAndUpdate', async function (next) {
-    const update = this.getUpdate();
-    if (update.entity) {
-        const Entity = mongoose.model(this.entityModel);
-        const entity = await Entity.findById(update.entity)
-            .select('slug')
-            .lean();
-        if (entity) {
-            update.slug = entity.slug;
-            this.setUpdate(update);
         }
     }
     next();

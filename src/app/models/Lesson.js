@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Course = require('./Course');
 const Schema = mongoose.Schema;
 const { ObjectId } = Schema.Types;
 
@@ -26,28 +27,13 @@ LessonSchema.virtual('course', {
 // Auto-set slug before saving
 LessonSchema.pre('save', async function (next) {
     if (this.courseId && !this.slug) {
-        const Course = mongoose.model('courses');
-        const course = await Course.findById(this.courseId)
+        const session = this.$session();
+        const course = await Course.findById(this.courseId, null, { session })
             .select('slug')
             .lean();
+
         if (course) {
             this.slug = course.slug;
-        }
-    }
-    next();
-});
-
-// Also update slug if courseId changes
-LessonSchema.pre('findOneAndUpdate', async function (next) {
-    const update = this.getUpdate();
-    if (update.courseId) {
-        const Course = mongoose.model('courses');
-        const course = await Course.findById(update.courseId)
-            .select('slug')
-            .lean();
-        if (course) {
-            update.slug = course.slug;
-            this.setUpdate(update);
         }
     }
     next();
